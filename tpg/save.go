@@ -230,8 +230,7 @@ func WriteDPXFile(f *os.File, toDraw draw.Image, bit int) error {
 	}
 
 	//assert the image here as
-
-	return dpx.Encode(f, toDraw.(*image.NRGBA64), bit)
+	return dpx.Encode(f, toDraw.(*image.NRGBA64), &dpx.Options{Bitdepth: bit})
 }
 
 func WriteCSVFile(file *os.File, img draw.Image, empty int) error {
