@@ -10,7 +10,7 @@ import (
 	"sync"
 
 	"github.com/mrmxf/opentsg-core/config/validator"
-	mmReader "github.com/mrmxf/opentsg-core/credentials"
+	"github.com/mrmxf/opentsg-core/credentials"
 	"gopkg.in/yaml.v3"
 )
 
@@ -18,7 +18,7 @@ import (
 // It returns a context holding them, the number of frames to be run and any errors encountered.
 func FileImport(inputFile, profile string, debug bool, httpKeys ...string) (context.Context, int, error) {
 	cont := context.Background()
-	authDecoder, err := mmReader.AuthInit(profile, httpKeys...)
+	authDecoder, err := credentials.AuthInit(profile, httpKeys...)
 	if err != nil {
 		return cont, 0, fmt.Errorf("0000 %v", err)
 	}
