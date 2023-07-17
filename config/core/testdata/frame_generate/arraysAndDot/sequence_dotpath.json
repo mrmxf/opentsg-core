@@ -1,0 +1,9 @@
+{
+    "include":[
+        {"uri": "./frame_dotpath.json", "name":"frame"}
+    ],
+    "create":[
+        {"frame": {"swatchType":"blue"}},
+        {"frame": {"swatchType":"green"}}
+    ]
+}
