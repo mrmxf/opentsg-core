@@ -71,20 +71,26 @@ func WidgetRunner[T Generator](canvasChan chan draw.Image, g GenConf[T], c *cont
 		logs.PrintErrorMessage("E_"+errorCode+"_INIT_", putErr, g.Debug)
 	}
 
-	//additions := make([]adder, len(runMap))
+	// print any error message before you can return
+	if len(err) > 0 {
+		for _, e := range err {
+			logs.PrintErrorMessage("E_"+errorCode+"_INIT_", e, g.Debug)
+		}
+	}
 
+	// get the widget runorder
 	runOrder := getOrder(runMap)
 	if len(runOrder) == 0 {
 		return
 	}
 
-	if len(err) > 0 {
+	/*	if len(err) > 0 {
 
 		for _, e := range err {
 			logs.PrintErrorMessage("E_"+errorCode+"_INIT_", e, g.Debug)
 		}
 		/*run as if the images had been made so the zpos does not fall out of sync
-		and we are stuck with an endless cycle*/
+		and we are stuck with an endless cycle
 		count := 0 // these runorders no longer run for errored messages as they are not assigned
 		for count < len(runOrder) {
 			z := (*c).Value(zKey).(*int)
@@ -97,7 +103,7 @@ func WidgetRunner[T Generator](canvasChan chan draw.Image, g GenConf[T], c *cont
 		}
 
 		return
-	}
+	} */
 
 	// wait until the first position is ready to run to stop overloads
 	for {
