@@ -2,6 +2,13 @@ package colour
 
 import "image/color"
 
+var (
+	Library = map[space]map[space]func(color.Color) color.Color{
+		{space: "nothing"}: {
+			space{space: "inverse"}: inverse},
+	}
+)
+
 func transform(input, output space, cols color.Color) color.Color {
 
 	if input.space == output.space {
@@ -9,14 +16,25 @@ func transform(input, output space, cols color.Color) color.Color {
 	}
 
 	// else get transformation
-	// getTransform(input)
+	tf := getTransform(input, output)
 	// apply transformatoin
 
-	return inverse(cols)
+	return tf(cols)
 }
 
-func getTransform(input, output space) {
+func getTransform(input, output space) func(color.Color) color.Color {
 
+	/*
+	
+	get multiple transforms, how would luts differ from a matrix
+
+	how do we allow multiple types of transformation e.g. clipping and transformation matrix
+
+	keep one matri for everything. Make a way to have strings and strcuts as part of the library
+	
+	*/
+
+	return Library[input][output]
 }
 
 func inverse(c color.Color) color.Color {
