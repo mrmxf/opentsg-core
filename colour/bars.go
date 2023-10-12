@@ -28,7 +28,7 @@ const (
 	h = 171 / 1920.0
 )
 
-func (br bar) generate(canvas Image) {
+func (br bar) generate(canvas WidgetImage) {
 	b := canvas.Bounds().Max
 	w := 0.0
 	twidth := 0.0
@@ -38,15 +38,9 @@ func (br bar) generate(canvas Image) {
 	for _, f := range fills {
 		twidth += f.width * float64(b.X)
 		area := image.Rect(int(w), int(0), int(w+f.width*float64(b.X)), b.Y)
-		var fill image.Image
 
-		if f.color != nil {
-			c := transform(canvas.Space(), br.Space, f.color)
-			// fill = &image.Uniform{f.color}
-			fill = &image.Uniform{c}
-		}
-
-		draw.Draw(canvas, area, fill, image.Point{}, draw.Src)
+		canvas.Draw(area, f.color, draw.Src, br.Space)
+		//draw.Draw(canvas, area, fill, image.Point{}, draw.Src)
 
 		w += f.width * float64(b.X)
 	}
