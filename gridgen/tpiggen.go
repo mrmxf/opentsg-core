@@ -195,7 +195,8 @@ func Carve(c *context.Context, canvas draw.Image, target []string) []ImageLocati
 
 }
 
-func splice(c *context.Context, x, y int, size image.Point) {
+// splice generates the neighbours for use with tpig patterns in the tsg forms
+func splice(c *context.Context, x, y float64, size image.Point) {
 
 	//get the poistions here []segemnter
 	geometryHolder := (*c).Value(tilekey) //, utilitySegements)
@@ -213,7 +214,7 @@ func splice(c *context.Context, x, y int, size image.Point) {
 	*c = cmid
 }
 
-func splicetpig(segments []Segmenter, x, y int, size image.Point) map[string][]Segmenter {
+func splicetpig(segments []Segmenter, x, y float64, size image.Point) map[string][]Segmenter {
 	sections := make(map[string][]Segmenter)
 	for xpos := 0; xpos < size.X; xpos += x {
 
@@ -241,7 +242,7 @@ func splicetpig(segments []Segmenter, x, y int, size image.Point) map[string][]S
 	return sections
 }
 
-func splicegrid(x, y int, size image.Point) map[string][]Segmenter {
+func splicegrid(x, y float64, size image.Point) map[string][]Segmenter {
 	sections := make(map[string][]Segmenter)
 	count := 0
 	for xpos := 0; xpos < size.X; xpos += x {
@@ -285,7 +286,7 @@ func splicegrid(x, y int, size image.Point) map[string][]Segmenter {
 	return sections
 }
 
-// gridToScale converts an x coordiante to excel letter notation.
+// gridToScale converts an x coordinate to excel letter notation.
 // Where 0 is A, 1 is B etc
 func gridToScale(x int) string {
 

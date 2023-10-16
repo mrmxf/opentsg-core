@@ -72,8 +72,8 @@ func baseGen(c *context.Context, geomCanvas draw.Image) (draw.Image, error) {
 		return canvas, fmt.Errorf("0041 No columns or rows declared, got %v rows and %v columns", y, x)
 	}
 	// make sure the number is a whole number etc
-	squareX := canvas.Bounds().Max.X / x
-	squareY := canvas.Bounds().Max.Y / y
+	squareX := float64(canvas.Bounds().Max.X) / float64(x)
+	squareY := float64(canvas.Bounds().Max.Y) / float64(y)
 	gridToScale(x) // Tell the user the valid list of coordinates, not used anymore
 	cmid := context.WithValue(*c, xkey, squareX)
 	cmid = context.WithValue(cmid, ykey, squareY)
@@ -132,17 +132,31 @@ func gridGen(c *context.Context, geomCanvas canvasAndMask) (draw.Image, error) {
 	if err != nil {
 		return canvas, err
 	}
-	squareX := (*c).Value(xkey).(int)
-	squareY := (*c).Value(ykey).(int)
+
+	squareX := (*c).Value(xkey).(float64)
+	squareY := (*c).Value(ykey).(float64)
 	// make a grid frame for each generated module
 	width := getWidth(*c)
-	gImage := maskGen(squareX, squareY, width, c)
+	// gImage := maskGen(squareX, squareY, width, c)
+	squares := make(map[image.Point]image.Image)
 
 	// make the squares
-	for a := 0; a < canvas.Bounds().Max.X; a += squareX {
-		for b := 0; b < canvas.Bounds().Max.Y; b += squareY {
-			draw.Draw(canvas, image.Rect(a, b, a+squareX, b+squareY), gImage, image.Point{}, draw.Over)
+	x := 0.0
+	for x < float64(canvas.Bounds().Max.X) {
+		y := 0.0
+		for y < float64(canvas.Bounds().Max.Y) {
+
+			size := image.Point{X: int(x+squareX) - int(x), Y: int(y+squareY) - int(y)}
+			gImage, ok := squares[size]
+			if !ok {
+				gImage = maskGen(size.X, size.Y, width, c)
+				squares[size] = gImage
+			}
+
+			draw.Draw(canvas, image.Rect(int(x), int(y), int(x+squareX), int(y+squareY)), gImage, image.Point{}, draw.Over)
+			y += squareY
 		}
+		x += squareX
 	}
 	// if there is a global mask apply it
 	if (geomCanvas != canvasAndMask{}) {
