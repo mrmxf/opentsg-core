@@ -1,14 +1,13 @@
 package colour
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
 )
 
 type bar struct {
-	Space space
+	Space Space
 }
 
 type bars struct {
@@ -56,7 +55,8 @@ const (
 	h = 171 / 1920.0
 )
 
-func (br bar) generate(canvas WidgetImage) {
+/*
+func (br bar) generate(canvas Image) {
 	b := canvas.Bounds().Max
 	w := 0.0
 	twidth := 0.0
@@ -73,9 +73,9 @@ func (br bar) generate(canvas WidgetImage) {
 		w += f.width * float64(b.X)
 	}
 
-}
+}*/
 
-func (br bar) generate2(canvas draw.Image) {
+func (br bar) generate2(canvas Image) {
 	b := canvas.Bounds().Max
 	w := 0.0
 	twidth := 0.0
@@ -104,22 +104,22 @@ func (br bar) generate2(canvas draw.Image) {
 
 }
 
-func (br bar) generateYCbCr(canvas draw.Image) {
+func (br bar) generateYCbCr(canvas Image) {
 	b := canvas.Bounds().Max
 	w := 0.0
 	twidth := 0.0
 
 	// fills := []bars{{width: d, color: gray40YCbCr}, {width: f, color: white75YCbCr}, {width: c, color: yellow75YCbCr}, {width: c, color: cyan75YCbCr}, {width: c, color: green75YCbCr}, {width: c, color: mag75YCbCr}, {width: c, color: red75YCbCr}, {width: f, color: blue75YCbCr}, {width: d, color: gray40YCbCr}}
 	fills := []bars{{width: d, color: gray40}, {width: f, color: white75}, {width: c, color: yellow75}, {width: c, color: cyan75}, {width: c, color: green75}, {width: c, color: mag75}, {width: c, color: red75}, {width: f, color: blue75}, {width: d, color: gray40}}
-	
+
 	for _, f := range fills {
 		twidth += f.width * float64(b.X)
 		area := image.Rect(int(w), int(0), int(w+f.width*float64(b.X)), b.Y)
 
 		R, G, B, _ := f.color.RGBA()
-		fmt.Println(uint8(R>>8), uint8(G>>8), uint8(B>>8))
+		//	fmt.Println(uint8(R>>8), uint8(G>>8), uint8(B>>8))
 		Y, cb, cr := color.RGBToYCbCr(uint8(R>>8), uint8(G>>8), uint8(B>>8))
-		fmt.Println(Y, cb, cr)
+		//	fmt.Println(Y, cb, cr)
 		//	fmt.Println(fill.RGBA())
 
 		fill := &CYCbCr{Y: Y, Cb: cb, Cr: cr, Space: br.Space}

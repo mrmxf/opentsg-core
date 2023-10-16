@@ -71,6 +71,7 @@ func baseGen(c *context.Context, geomCanvas draw.Image) (draw.Image, error) {
 	if x == 0 || y == 0 {
 		return canvas, fmt.Errorf("0041 No columns or rows declared, got %v rows and %v columns", y, x)
 	}
+	// @TODO make these scale, not be whole numbers
 	// make sure the number is a whole number etc
 	squareX := canvas.Bounds().Max.X / x
 	squareY := canvas.Bounds().Max.Y / y

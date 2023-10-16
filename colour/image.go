@@ -7,14 +7,27 @@ import (
 )
 
 /*
-space will need some methods as transforms get more complicated
+Space will need some methods as transforms get more complicated
 */
-type space struct {
-	space string
+type Space struct {
+	Space string
+	// Primaries let the space be declared as a string and the primaries
+	// be sued for generating transformation matrices.
+	// Have two seperate maps for data points
+	TransformType string
+	Primaries     Primaries
+}
+
+type Primaries struct {
+	Red, Green, Blue, WhitePoint XY
+}
+
+type XY struct {
+	X, Y int
 }
 
 type Image interface {
-	Draw(image.Rectangle, color.Color, draw.Op, space)
+	Space() Space
 	draw.Image // Draw include Set
 }
 
@@ -35,41 +48,9 @@ any textbox
 
 */
 
-type WidgetImage interface {
-	Draw(image.Rectangle, color.Color, draw.Op, space)
-	image.Image // image does not include yet
-}
-
-// replicate this but for Aces
 type NRGB64 struct {
-	*image.NRGBA64
-	spacer space
-}
-
-// Draw wraps image.Draw
-func (n NRGB64) Draw(r image.Rectangle, src color.Color, op draw.Op, input space) {
-
-	ts := transform(input, n.spacer, src)
-	//ts := transformer(src, n.Spacer)
-
-	draw.Draw(n, r, &image.Uniform{ts}, image.Point{}, op)
-
-}
-
-// This wraps th eimage library adding colourspaces
-// to the image. While including all th ebasic image
-// functionality
-func newNRGBA64(s space, r image.Rectangle) Image {
-
-	base := image.NewNRGBA64(r)
-
-	return &NRGB64{base, s}
-
-}
-
-type NRGB642 struct {
-	Base   *image.NRGBA64
-	spacer space
+	base  *image.NRGBA64
+	space Space
 }
 
 /*
@@ -80,38 +61,51 @@ My current idea is using interface for NRGBa for our own colour tyoe that applie
 replacing the interface with one that returns the colour space for prosperity
 */
 
-func newNRGBA642(s space, r image.Rectangle) draw.Image {
+func NewNRGBA64(s Space, r image.Rectangle) Image {
 
 	base := image.NewNRGBA64(r)
 
-	return &NRGB642{Base: base, spacer: s}
+	return &NRGB64{base: base, space: s}
 
 }
 
-func (n NRGB642) Bounds() image.Rectangle {
-	return n.Base.Bounds()
+func (n NRGB64) Bounds() image.Rectangle {
+	return n.base.Bounds()
 }
 
-func (n NRGB642) At(x, y int) color.Color {
-	return n.Base.At(x, y)
+func (n NRGB64) Space() Space {
+	return n.space
+}
+
+func (n NRGB64) At(x, y int) color.Color {
+	/* can wrap
+		NRGBA 64 colour as an tsg.colour
+		if we want to preserve colour space
+	 //	n.Base.NRGBA64At(x,y)
+
+	*/
+
+	baseCol := n.base.NRGBA64At(x, y)
+	// return a colour space aware colour
+	return &CNRGBA64{R: baseCol.R, G: baseCol.G, B: baseCol.B, A: baseCol.A, Space: n.space}
 
 }
 
-func (n NRGB642) ColorModel() color.Model {
-	return n.Base.ColorModel()
+func (n NRGB64) ColorModel() color.Model {
+	return n.base.ColorModel()
 }
-
 
 // utilise set for draw
-func (n NRGB642) Set(x int, y int, c color.Color) {
+func (n NRGB64) Set(x int, y int, c color.Color) {
 
 	// update the colour if it has an explicit colour space
 	if cmid, ok := c.(ColorSpace); ok {
-		c = transform(cmid.GetSpace(), n.spacer, c)
+		c = transform(cmid.GetSpace(), n.space, c)
 	}
 
-	n.Base.Set(x, y, c)
+	n.base.Set(x, y, c)
 }
+
 /*
 use draw and set
 
