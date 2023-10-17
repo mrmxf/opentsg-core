@@ -10,18 +10,73 @@ import (
 	"os"
 	"testing"
 
+	"github.com/mrmxf/opentsg-core/canvaswidget"
 	"github.com/mrmxf/opentsg-core/config/core"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 // put some inputs in and check the bounds of the image we get out
 
+func TestGrids(t *testing.T) {
+
+	getWidth = func(c context.Context) float64 { return 1 }
+	size = func(c context.Context) image.Point { return image.Point{1000, 1000} }
+	imageType = func(c context.Context) string { return "" }
+
+	// Colours
+	getFill = func(c context.Context) string { return "#ffffff" }
+
+	sizes := []image.Point{{7, 23}, {8, 25}}
+	gridType := []string{"SqueezeGrid", "UniformGrid"}
+
+	for i, size := range sizes {
+
+		rows = func(c context.Context) int { return size.Y }
+		cols = func(c context.Context) int { return size.X }
+
+		c := context.Background()
+		cPoint := &c
+
+		base, err := GridGen(cPoint)
+
+		f, _ := os.Open("testdata/grids/" + gridType[i] + ".png")
+		baseVals, _ := png.Decode(f)
+
+		readImage := image.NewNRGBA64(baseVals.Bounds())
+		draw.Draw(readImage, readImage.Bounds(), baseVals, image.Point{0, 0}, draw.Src)
+		// make a hash of the pixels of each image
+		hnormal := sha256.New()
+		htest := sha256.New()
+		hnormal.Write(readImage.Pix)
+		htest.Write(base.(*image.NRGBA64).Pix)
+
+		Convey("Checking the grids fit on the base testcard", t, func() {
+			Convey(fmt.Sprintf("using a %v, %v as the row and column counts", size.Y, size.X), func() {
+				Convey("The generated images have grids that fill the test card", func() {
+					So(err, ShouldBeNil)
+					So(htest.Sum(nil), ShouldResemble, hnormal.Sum(nil))
+				})
+			})
+		})
+
+	}
+
+	// reset everything for use with the other tests
+	rows = canvaswidget.GetGridRows
+	cols = canvaswidget.GetGridColumns
+	getWidth = canvaswidget.GetLWidth
+	size = canvaswidget.GetPictureSize
+	imageType = canvaswidget.GetCanvasType
+	// Colours
+	getFill = canvaswidget.GetFillColour
+}
+
 // make a test for the json init stage
 
 func TestPtoCanvas(t *testing.T) { // test the way [{}] are read etc
 	// test empty and bad json and look at the output
-	squareX := 100
-	squareY := 100
+	squareX := 100.0
+	squareY := 100.0
 	c := context.Background()
 	cmid := context.WithValue(c, xkey, squareX)
 	cmid = context.WithValue(cmid, ykey, squareY)
@@ -60,6 +115,7 @@ func TestPtoCanvas(t *testing.T) { // test the way [{}] are read etc
 
 	for i, size := range badSize {
 		toCheck, pCheck, _, err := GridSquareLocatorAndGenerator(size, badAlias[i], cPoint)
+		//_, pCheck, _, err := GridSquareLocatorAndGenerator(size, badAlias[i], cPoint)
 		Convey("Checking the differrent methods of bad string input to make a map", t, func() {
 			Convey(fmt.Sprintf("using a %v as the input coordinates", size), func() {
 				Convey(fmt.Sprintf("An error of %v is returned as these are invalid coordinates", badE[i]), func() {
@@ -79,6 +135,7 @@ func TestPtoCanvas(t *testing.T) { // test the way [{}] are read etc
 
 	for i, size := range tooLarge {
 		toCheck, pCheck, _, err := GridSquareLocatorAndGenerator(size, "", cPoint)
+		//_, pCheck, _, err := GridSquareLocatorAndGenerator(size, "", cPoint)
 		Convey("Checking the differrent methods of bad string input to make a map", t, func() {
 			Convey(fmt.Sprintf("using a %v as the input coordinates", size), func() {
 				Convey(fmt.Sprintf("An error of %v is returned as these are invalid coordinates", badE[i]), func() {

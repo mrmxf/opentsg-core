@@ -14,7 +14,6 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-
 func TestTpigGeometry(t *testing.T) {
 	// get my picture size
 	//// check the lines of halves and fulls
@@ -50,7 +49,7 @@ func TestTpigGeometry(t *testing.T) {
 	/* loop through the different variations ensuring each method works
 	 */
 
-	splice(cp, 10, 10, image.Point{30, 30})
+	splice(cp, 3, 3, 10, 10)
 
 	gridtarget := []string{"A1", "A0:a2", "r2c3", "R1C1:R3C3"}
 	expectedSegment := [][]Segmenter{
@@ -139,13 +138,13 @@ func TestGridGeometry(t *testing.T) {
 	})
 
 	baseGen(cp, nil)
-	splice(cp, 10, 10, image.Point{30, 30})
+	splice(cp, 3, 3, 10, 10)
 
 	fmt.Println(e)
 	cd := context.Background()
 	cpp := &cd
 	baseGen(cpp, nil)
-	splice(cpp, 10, 10, image.Point{30, 30})
+	splice(cpp, 3, 3, 10, 10)
 
 	s, e := GetGridGeometry(cpp, "A0:A2")
 	fmt.Println(s, e)
