@@ -195,7 +195,8 @@ func Carve(c *context.Context, canvas draw.Image, target []string) []ImageLocati
 
 }
 
-func splice(c *context.Context, x, y int, size image.Point) {
+// splice generates the neighbours for use with tpig patterns in the tsg forms
+func splice(c *context.Context, x, y int, xscale, yscale float64) {
 
 	//get the poistions here []segemnter
 	geometryHolder := (*c).Value(tilekey) //, utilitySegements)
@@ -204,27 +205,33 @@ func splice(c *context.Context, x, y int, size image.Point) {
 	var sections map[string][]Segmenter
 	if geometryHolder != nil {
 		geometry := geometryHolder.([]Segmenter)
-		sections = splicetpig(geometry, x, y, size)
+		sections = splicetpig(geometry, x, y, xscale, yscale)
 	} else {
-		sections = splicegrid(x, y, size)
+		sections = splicegrid(x, y, xscale, yscale)
 	}
 
 	cmid := context.WithValue(*c, gridkey, sections)
 	*c = cmid
 }
 
-func splicetpig(segments []Segmenter, x, y int, size image.Point) map[string][]Segmenter {
-	sections := make(map[string][]Segmenter)
-	for xpos := 0; xpos < size.X; xpos += x {
+/*
+map[A0:[{A000 (0,0)-(10,10) [] 0}] A1:[{A001 (0,10)-(10,20) [] 1}] A2:[] R4C0:[{A002 (10,0)-(25,15) [] 2} {A003 (28,0)-(30,30) [] 3}] R4C1:[{A002 (10,0)-(25,15) [] 2} {A003 (28,0)-(30,30) [] 3}] R4C2:[{A003 (28,0)-(30,30) [] 3} {A004 (20,20)-(30,30) [] 4}] a0:[{A002 (10,0)-(25,15) [] 2}] a1:[{A002 (10,0)-(25,15) [] 2}] a2:[] b0:[{A002 (10,0)-(25,15) [] 2} {A003 (28,0)-(30,30) [] 3}] b1:[{A002 (10,0)-(25,15) [] 2} {A003 (28,0)-(30,30) [] 3}] b2:[{A003 (28,0)-(30,30) [] 3} {A004 (20,20)-(30,30) [] 4}]]
+[]gridgen.Segmenter{gridgen.Segmenter{Name:"A000", Shape:image.Rectangle{Min:image.Point{X:0, Y:0}, Max:image.Point{X:10, Y:10}}, Tags:[]string{}, importPosition:0}, gridgen.Segmenter{Name:"A001", Shape:image.Rectangle{Min:image.Point{X:0, Y:10}, Max:image.Point{X:10, Y:20}}, Tags:[]string{}, importPosition:1}, gridgen.Segmenter{Name:"A002", Shape:image.Rectangle{Min:image.Point{X:10, Y:0}, Max:image.Point{X:25, Y:15}}, Tags:[]string{}, importPosition:2}, gridgen.Segmenter{Name:"A003", Shape:image.Rectangle{Min:image.Point{X:28, Y:0}, Max:image.Point{X:30, Y:30}}, Tags:[]string{}, importPosition:3}, gridgen.Segmenter{Name:"A004", Shape:image.Rectangle{Min:image.Point{X:20, Y:20}, Max:image.Point{X:30, Y:30}}, Tags:[]string{}, importPosition:4}}
 
-		for ypos := 0; ypos < size.Y; ypos += y {
+*/
+
+func splicetpig(segments []Segmenter, x, y int, xscale, yscale float64) map[string][]Segmenter {
+	sections := make(map[string][]Segmenter)
+	for xpos := 0; xpos < x; xpos++ {
+
+		for ypos := 0; ypos < y; ypos++ {
 
 			// generate the name for both methods of grid coordinates
-			gridCoord := fmt.Sprintf("%v%v", gridToScale(xpos/x), ypos/y)
-			gridRCCoord := fmt.Sprintf("R%vC%v", xpos/x+1, ypos/y+1)
+			gridCoord := fmt.Sprintf("%v%v", gridToScale(xpos), ypos)
+			gridRCCoord := fmt.Sprintf("R%vC%v", xpos+1, ypos+1)
 
 			matches := []Segmenter{}
-			bounding := image.Rect(xpos, ypos, xpos+x, ypos+y)
+			bounding := image.Rect(int(float64(xpos)*xscale), int(float64(ypos)*yscale), int(float64(xpos+1)*xscale), int(float64(ypos+1)*yscale))
 
 			// check every segment to see where if it is within the grid
 			for _, g := range segments {
@@ -241,39 +248,39 @@ func splicetpig(segments []Segmenter, x, y int, size image.Point) map[string][]S
 	return sections
 }
 
-func splicegrid(x, y int, size image.Point) map[string][]Segmenter {
+func splicegrid(x, y int, xscale, yscale float64) map[string][]Segmenter {
 	sections := make(map[string][]Segmenter)
 	count := 0
-	for xpos := 0; xpos < size.X; xpos += x {
+	for xpos := 0; xpos < x; xpos++ {
 
-		for ypos := 0; ypos < size.Y; ypos += y {
-			bounding := image.Rect(xpos, ypos, xpos+x, ypos+y)
+		for ypos := 0; ypos < y; ypos++ {
+			bounding := image.Rect(int(float64(xpos)*xscale), int(float64(ypos)*yscale), int(float64(xpos+1)*xscale), int(float64(ypos+1)*yscale))
 			// switch for neighbours. 4 if statememts if x != x then go back 1 etc
-			gridCoord := fmt.Sprintf("%v%v", gridToScale(xpos/x), ypos/y)
-			gridRCCoord := fmt.Sprintf("R%vC%v", xpos/x+1, ypos/y+1)
+			gridCoord := fmt.Sprintf("%v%v", gridToScale(xpos), ypos)
+			gridRCCoord := fmt.Sprintf("R%vC%v", xpos+1, ypos+1)
 
 			tagsRC, tagsC := []string{}, []string{}
 
 			// generate the neighbours using simple if statements for each position
 
 			if xpos != 0 {
-				tagsC = append(tagsRC, fmt.Sprintf("neighbour:%v%v", gridToScale((xpos/x)-1), ypos/y))
-				tagsRC = append(tagsC, fmt.Sprintf("neighbour:R%vC%v", (xpos/x+1)-1, ypos/y+1))
+				tagsC = append(tagsRC, fmt.Sprintf("neighbour:%v%v", gridToScale(xpos), ypos))
+				tagsRC = append(tagsC, fmt.Sprintf("neighbour:R%vC%v", xpos+1, ypos+1))
 			}
 
-			if xpos+x < size.X {
-				tagsC = append(tagsRC, fmt.Sprintf("neighbour:%v%v", gridToScale((xpos/x)+1), ypos/y))
-				tagsRC = append(tagsC, fmt.Sprintf("neighbour:R%vC%v", (xpos/x+1)+1, ypos/y+1))
+			if xpos+1 < x {
+				tagsC = append(tagsRC, fmt.Sprintf("neighbour:%v%v", gridToScale(xpos), ypos))
+				tagsRC = append(tagsC, fmt.Sprintf("neighbour:R%vC%v", xpos+1, ypos+1))
 			}
 
 			if ypos != 0 {
-				tagsC = append(tagsRC, fmt.Sprintf("neighbour:%v%v", gridToScale((xpos/x)), (ypos/y)-1))
-				tagsRC = append(tagsC, fmt.Sprintf("neighbour:R%vC%v", (xpos/x+1), (ypos/y)-1))
+				tagsC = append(tagsRC, fmt.Sprintf("neighbour:%v%v", gridToScale(xpos), ypos))
+				tagsRC = append(tagsC, fmt.Sprintf("neighbour:R%vC%v", xpos+1, (ypos-1)))
 			}
 
-			if ypos+y < size.Y {
-				tagsC = append(tagsRC, fmt.Sprintf("neighbour:%v%v", gridToScale((xpos/x)), (ypos/y)+1))
-				tagsRC = append(tagsC, fmt.Sprintf("neighbour:R%vC%v", (xpos/x+1), (ypos/y)+1))
+			if ypos+1 < y {
+				tagsC = append(tagsRC, fmt.Sprintf("neighbour:%v%v", gridToScale(xpos), ypos+1))
+				tagsRC = append(tagsC, fmt.Sprintf("neighbour:R%vC%v", xpos+1, ypos+1))
 			}
 
 			sections[gridCoord] = []Segmenter{{Name: gridCoord, Shape: bounding, Tags: tagsC, importPosition: count}}
@@ -285,7 +292,7 @@ func splicegrid(x, y int, size image.Point) map[string][]Segmenter {
 	return sections
 }
 
-// gridToScale converts an x coordiante to excel letter notation.
+// gridToScale converts an x coordinate to excel letter notation.
 // Where 0 is A, 1 is B etc
 func gridToScale(x int) string {
 
@@ -300,7 +307,9 @@ func gridToScale(x int) string {
 			// generate mod with custom function to account for the excel style
 			off, remainder := divMod(input, 26)
 			input = off
-			results = append(results, rune(96+remainder))
+			//fmt.Println(remainder, string(rune(65+remainder)), rune('A'))
+
+			results = append(results, rune(rune('A')+int32(remainder)))
 		}
 	}
 
@@ -365,8 +374,8 @@ func getGridGeometry(c *context.Context, coordinate string) ([]Segmenter, error)
 	regSing := regexp.MustCompile("^[a-zA-Z]{1,3}[0-9]{1,3}$")
 	regArea := regexp.MustCompile("^[a-zA-Z]{1,3}[0-9]{1,3}:[a-zA-Z]{1,3}[0-9]{1,3}$")
 	regAlias := regexp.MustCompile(`^[\w\W]{1,30}$`)
-	squareX := (*c).Value(xkey).(int)
-	squareY := (*c).Value(ykey).(int)
+	squareX := (*c).Value(xkey).(float64)
+	squareY := (*c).Value(ykey).(float64)
 	regRC := regexp.MustCompile(`^[Rr]([\d]{2,}|[1-9]{1})[Cc]([\d]{2,}|[1-9]{1})$`)
 	regRCArea := regexp.MustCompile(`^[Rr]([\d]{2,}|[1-9]{1})[Cc]([\d]{2,}|[1-9]{1}):[Rr]([\d]{2,}|[1-9]{1})[Cc]([\d]{2,}|[1-9]{1})$`)
 
@@ -382,7 +391,7 @@ func getGridGeometry(c *context.Context, coordinate string) ([]Segmenter, error)
 			return []Segmenter{}, err
 		}
 
-		offseted := segementWithOffset(image.Point{-x * squareX, -y * squareY}, sections[coordinate])
+		offseted := segementWithOffset(image.Point{int(float64(-x) * squareX), int(float64(-y) * squareY)}, sections[coordinate])
 		return offseted, nil
 	case regArea.MatchString(coordinate):
 		// gridSplit(gridString) //split it around :
@@ -411,7 +420,7 @@ func getGridGeometry(c *context.Context, coordinate string) ([]Segmenter, error)
 		for xpos := x; xpos <= xend; xpos++ {
 			for ypos := y; ypos <= yend; ypos++ {
 				grid := fmt.Sprintf("%v%v", gridToScale(xpos), ypos)
-				segements = append(segements, segementWithOffset(image.Point{-x * squareX, -y * squareY}, sections[grid])...)
+				segements = append(segements, segementWithOffset(image.Point{int(float64(-x) * squareX), int(float64(-y) * squareY)}, sections[grid])...)
 			}
 		}
 
@@ -421,7 +430,9 @@ func getGridGeometry(c *context.Context, coordinate string) ([]Segmenter, error)
 
 		x, y := 0, 0
 		fmt.Sscanf(coordinate, "R%dC%d", &x, &y)
-		offseted := segementWithOffset(image.Point{-(x - 1) * squareX, -(y - 1) * squareY}, sections[coordinate])
+		// offseted := segementWithOffset(image.Point{-(x - 1) * squareX, -(y - 1) * squareY}, sections[coordinate])
+		offseted := segementWithOffset(image.Point{int(float64(-(x - 1)) * squareX), int(float64(-(y - 1)) * squareY)}, sections[coordinate])
+
 		return offseted, nil
 
 	case regRCArea.MatchString(coordinate):
@@ -438,7 +449,9 @@ func getGridGeometry(c *context.Context, coordinate string) ([]Segmenter, error)
 		for xpos := xs; xpos <= xe; xpos++ {
 			for ypos := ys; ypos <= ye; ypos++ {
 				grid := fmt.Sprintf("R%vC%v", xpos, ypos)
-				segements = append(segements, segementWithOffset(image.Point{-(xs - 1) * squareX, -(ys - 1) * squareY}, sections[grid])...)
+
+				//	segements = append(segements, segementWithOffset(image.Point{-(xs - 1) * squareX, -(ys - 1) * squareY}, sections[grid])...)
+				segements = append(segements, segementWithOffset(image.Point{int(float64(-(xs - 1)) * squareX), int(float64(-(ys - 1)) * squareY)}, sections[grid])...)
 			}
 		}
 		return segements, nil
