@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/mmTristan/opentsg-core/canvaswidget"
+	"github.com/mmTristan/opentsg-core/colour"
 	"github.com/mmTristan/opentsg-core/colourgen"
 	"github.com/mmTristan/opentsg-core/config/core"
 	errhandle "github.com/mmTristan/opentsg-core/errHandle"
@@ -262,7 +263,7 @@ type test struct {
 
 // Mock generator functions
 func (tt test) Generate(i draw.Image, t ...any) error {
-	c := colourgen.HexToColour(tt.Colour)
+	c := colourgen.HexToColour(tt.Colour, colour.ColorSpace{})
 	// fmt.Println(tt.Fill)
 	draw.Draw(i.(*image.NRGBA64), i.Bounds(), &image.Uniform{c}, image.Point{}, draw.Src)
 

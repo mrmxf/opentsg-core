@@ -65,7 +65,7 @@ func baseGen(c *context.Context, geomCanvas draw.Image) (draw.Image, error) {
 	background := color.NRGBA64{R: 46080, G: 46080, B: 46080, A: 0xffff}
 	colour := getFill(*c)
 	if colour != "" { // check for user defined colours
-		col := colourgen.HexToColour(colour)
+		col := colourgen.HexToColour(colour, colourSpaceType(*c))
 		background = colourgen.ConvertNRGBA64(col)
 	}
 
@@ -185,7 +185,7 @@ func maskGen(maxX, maxY int, width float64, c *context.Context) image.Image {
 	myBorder := color.NRGBA64{0, 0, 0, 0xffff}
 	colour := canvaswidget.GetLineColour(*c)
 	if colour != "" { // check for user defined colours
-		col := colourgen.HexToColour(colour)
+		col := colourgen.HexToColour(colour, colourSpaceType(*c))
 		myBorder = colourgen.ConvertNRGBA64(col)
 	}
 

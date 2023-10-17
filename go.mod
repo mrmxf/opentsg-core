@@ -1,6 +1,6 @@
 module github.com/mmTristan/opentsg-core
 
-go 1.21.1
+go 1.21.3
 
 require (
 	github.com/aws/aws-sdk-go v1.45.26
@@ -9,9 +9,9 @@ require (
 	github.com/cespare/xxhash v1.1.0
 	github.com/fogleman/gg v1.3.0
 	github.com/matoous/go-nanoid v1.5.0
+	github.com/mmTristan/opentsg-widgets v0.0.0-20231017143043-af0558860ba1
 	github.com/mrmxf/opentsg-io v0.0.0-20230830164134-91af35b9a721
 	github.com/mrmxf/opentsg-mhl v0.0.0-20230713210602-b4af671ab2ac
-	github.com/mrmxf/opentsg-widgets v0.0.0-20230830103148-29d264318c77
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/peterbourgon/mergemap v0.0.1
 	github.com/smartystreets/goconvey v1.8.1
