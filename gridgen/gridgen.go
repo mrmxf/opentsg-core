@@ -13,10 +13,11 @@ import (
 	"strings"
 
 	"github.com/fogleman/gg"
-	"github.com/mrmxf/opentsg-core/aces"
-	"github.com/mrmxf/opentsg-core/canvaswidget"
-	"github.com/mrmxf/opentsg-core/colourgen"
-	"github.com/mrmxf/opentsg-core/config/core"
+	"github.com/mmTristan/opentsg-core/aces"
+	"github.com/mmTristan/opentsg-core/canvaswidget"
+	"github.com/mmTristan/opentsg-core/colour"
+	"github.com/mmTristan/opentsg-core/colourgen"
+	"github.com/mmTristan/opentsg-core/config/core"
 )
 
 type gridContextKey struct {
@@ -40,8 +41,10 @@ var cols = canvaswidget.GetGridColumns
 var getWidth = canvaswidget.GetLWidth
 var size = canvaswidget.GetPictureSize
 var imageType = canvaswidget.GetCanvasType
+
 // Colours
 var getFill = canvaswidget.GetFillColour
+var colourSpaceType = canvaswidget.GetBaseColourSpace
 
 type canvasAndMask struct {
 	canvas, mask draw.Image
@@ -65,7 +68,7 @@ func baseGen(c *context.Context, geomCanvas draw.Image) (draw.Image, error) {
 		col := colourgen.HexToColour(colour)
 		background = colourgen.ConvertNRGBA64(col)
 	}
-	
+
 	draw.Draw(canvas, canvas.Bounds(), &image.Uniform{background}, image.Point{}, draw.Src)
 	// make the squares sizes
 	x := cols(*c)
@@ -95,7 +98,7 @@ func imageGenerator(c context.Context, canvasSize image.Rectangle) draw.Image {
 		return aces.NewARGBA(canvasSize)
 	}
 
-	return image.NewNRGBA64(canvasSize)
+	return colour.NewNRGBA64(colourSpaceType(c), canvasSize)
 
 }
 
@@ -145,7 +148,7 @@ func gridGen(c *context.Context, geomCanvas canvasAndMask) (draw.Image, error) {
 
 	// make the squares
 	x := 0.0
-	fmt.Println(squareX, squareY)
+
 	for x < float64(canvas.Bounds().Max.X) {
 		y := 0.0
 		for y < float64(canvas.Bounds().Max.Y) {
@@ -162,7 +165,7 @@ func gridGen(c *context.Context, geomCanvas canvasAndMask) (draw.Image, error) {
 		}
 		x += squareX
 	}
-	fmt.Println(squares)
+
 	// if there is a global mask apply it
 	if (geomCanvas != canvasAndMask{}) {
 		base := imageGenerator(*c, canvas.Bounds())
@@ -361,7 +364,7 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 		generatedGridInfo.Y = int(float64(ys-1) * squareY)
 		// make a 1x1 square
 		generatedGridInfo.w, generatedGridInfo.h = int(float64(xe-1)*squareX)-generatedGridInfo.X, int(float64(ye-1)*squareY)-generatedGridInfo.Y
-		fmt.Println(generatedGridInfo, xs, ys, xe, ye)
+
 		//squareX*(xe-xs), squareY*(ye-ys)
 	case regAlias.MatchString(gridString):
 		loc := aliasMap.Data[gridString]

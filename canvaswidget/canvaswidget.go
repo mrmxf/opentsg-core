@@ -9,8 +9,9 @@ import (
 
 	_ "embed"
 
-	"github.com/mrmxf/opentsg-core/config"
-	"github.com/mrmxf/opentsg-core/config/widgets"
+	"github.com/mmTristan/opentsg-core/colour"
+	"github.com/mmTristan/opentsg-core/config"
+	"github.com/mmTristan/opentsg-core/config/widgets"
 )
 
 type key struct {
@@ -25,6 +26,7 @@ var (
 type ConfigVals struct {
 	Type        string           `json:"type" yaml:"type"`
 	Name        []string         `json:"name,omitempty" yaml:"name,omitempty"`
+	ColourSpace colour.Space     `json:"ColorSpace,omitempty" yaml:"ColorSpace,omitempty"`
 	Framesize   config.Framesize `json:"frameSize,omitempty" yaml:"frameSize,omitempty"`
 	LineWidth   float64          `json:"linewidth,omitempty" yaml:"linewidth,omitempty"`
 	FileDepth   int              `json:"filedepth,omitempty" yaml:"filedepth,omitempty"`
@@ -119,6 +121,14 @@ func contToConf(c context.Context) ConfigVals {
 	}
 	// else return an empty struct which may cause breakages down the line
 	return ConfigVals{}
+}
+
+// GetBaseColourSpace returns the base testcard colourSpace
+func GetBaseColourSpace(c context.Context) colour.Space {
+
+	g := contToConf(c)
+
+	return g.ColourSpace
 }
 
 // GetFileType returns the file name for the image to be saved.

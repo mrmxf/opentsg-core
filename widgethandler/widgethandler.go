@@ -10,11 +10,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mrmxf/opentsg-core/canvaswidget"
-	"github.com/mrmxf/opentsg-core/config/core"
-	"github.com/mrmxf/opentsg-core/config/widgets"
-	errhandle "github.com/mrmxf/opentsg-core/errHandle"
-	"github.com/mrmxf/opentsg-core/gridgen"
+	"github.com/mmTristan/opentsg-core/canvaswidget"
+	"github.com/mmTristan/opentsg-core/config/core"
+	"github.com/mmTristan/opentsg-core/config/widgets"
+	errhandle "github.com/mmTristan/opentsg-core/errHandle"
+	"github.com/mmTristan/opentsg-core/gridgen"
 	"gopkg.in/yaml.v2"
 )
 

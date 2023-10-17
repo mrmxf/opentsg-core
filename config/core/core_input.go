@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/mrmxf/opentsg-core/config/validator"
-	"github.com/mrmxf/opentsg-core/credentials"
+	"github.com/mmTristan/opentsg-core/config/validator"
+	"github.com/mmTristan/opentsg-core/credentials"
 	"gopkg.in/yaml.v3"
 )
 

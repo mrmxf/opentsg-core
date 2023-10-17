@@ -29,11 +29,11 @@ import (
 	"github.com/mrmxf/opentsg-widgets/zoneplate"
 	"gopkg.in/yaml.v3"
 
-	"github.com/mrmxf/opentsg-core/canvaswidget"
-	"github.com/mrmxf/opentsg-core/config/core"
-	errhandle "github.com/mrmxf/opentsg-core/errHandle"
-	"github.com/mrmxf/opentsg-core/gridgen"
-	"github.com/mrmxf/opentsg-core/widgethandler"
+	"github.com/mmTristan/opentsg-core/canvaswidget"
+	"github.com/mmTristan/opentsg-core/config/core"
+	errhandle "github.com/mmTristan/opentsg-core/errHandle"
+	"github.com/mmTristan/opentsg-core/gridgen"
+	"github.com/mmTristan/opentsg-core/widgethandler"
 )
 
 type syncmap struct {

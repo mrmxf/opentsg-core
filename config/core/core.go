@@ -9,8 +9,8 @@ import (
 
 	_ "embed"
 
-	"github.com/mrmxf/opentsg-core/config/validator"
-	"github.com/mrmxf/opentsg-core/credentials"
+	"github.com/mmTristan/opentsg-core/config/validator"
+	"github.com/mmTristan/opentsg-core/credentials"
 )
 
 ////////////////

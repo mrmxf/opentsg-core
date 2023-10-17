@@ -10,8 +10,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/mrmxf/opentsg-core/canvaswidget"
-	"github.com/mrmxf/opentsg-core/config/core"
+	"github.com/mmTristan/opentsg-core/canvaswidget"
+	"github.com/mmTristan/opentsg-core/config/core"
 	. "github.com/smartystreets/goconvey/convey"
 )
 

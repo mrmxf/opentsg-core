@@ -10,6 +10,11 @@ var (
 		{Space: "inverse"}: {
 			Space{Space: "rec709"}: inverse},
 	}
+
+	lutLibrary = map[Space]map[Space]any{ // where any is a lut
+
+	}
+
 	// chromatic adaptation needs to be included as well
 
 	// rec 601 here http://www.brucelindbloom.com/index.html?WorkingSpaceInfo.html under PAL/SECAM RGB
@@ -31,6 +36,15 @@ var (
 		"rec2020": {{1.716651187971268, -0.35567078377639244, -0.25336628137365985}, {-0.666684351832489, 1.616481236634939, 0.015768545813911152}, {0.017639857445310787, -0.04277061325780852, 0.9421031212354738}},
 	}
 )
+
+type lut1D struct {
+}
+type lut3D struct {
+}
+
+type lut interface {
+	lut1D | lut3D
+}
 
 func transform(input, output Space, cols color.Color) color.Color {
 
@@ -58,7 +72,13 @@ func getTransform(input, output Space) func(color.Color) color.Color {
 
 	*/
 
-	// Also generate a method of going from x to y with matrces
+	/*
+		get the input transform type, if one isn't found check the output
+
+		if none go through in order of precedence. If there is a transofr type go through and check
+	*/
+
+	// Also generate a method of going from x to y with matrices
 
 	if fc, ok := Library[input][output]; ok {
 		return fc
