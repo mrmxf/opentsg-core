@@ -144,7 +144,7 @@ func gridGen(c *context.Context, geomCanvas canvasAndMask) (draw.Image, error) {
 
 	// make the squares
 	x := 0.0
-	fmt.Println(squareX, squareY)
+
 	for x < float64(canvas.Bounds().Max.X) {
 		y := 0.0
 		for y < float64(canvas.Bounds().Max.Y) {
@@ -161,7 +161,7 @@ func gridGen(c *context.Context, geomCanvas canvasAndMask) (draw.Image, error) {
 		}
 		x += squareX
 	}
-	fmt.Println(squares)
+	
 	// if there is a global mask apply it
 	if (geomCanvas != canvasAndMask{}) {
 		base := imageGenerator(*c, canvas.Bounds())
@@ -360,7 +360,7 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 		generatedGridInfo.Y = int(float64(ys-1) * squareY)
 		// make a 1x1 square
 		generatedGridInfo.w, generatedGridInfo.h = int(float64(xe-1)*squareX)-generatedGridInfo.X, int(float64(ye-1)*squareY)-generatedGridInfo.Y
-		fmt.Println(generatedGridInfo, xs, ys, xe, ye)
+		
 		//squareX*(xe-xs), squareY*(ye-ys)
 	case regAlias.MatchString(gridString):
 		loc := aliasMap.Data[gridString]
