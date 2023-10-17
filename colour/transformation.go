@@ -6,12 +6,12 @@ import (
 )
 
 var (
-	Library = map[Space]map[Space]func(color.Color) color.Color{
-		{Space: "inverse"}: {
-			Space{Space: "rec709"}: inverse},
+	Library = map[ColorSpace]map[ColorSpace]func(color.Color) color.Color{
+		{ColorSpace: "inverse"}: {
+			ColorSpace{ColorSpace: "rec709"}: inverse},
 	}
 
-	lutLibrary = map[Space]map[Space]any{ // where any is a lut
+	lutLibrary = map[ColorSpace]map[ColorSpace]any{ // where any is a lut
 
 	}
 
@@ -46,10 +46,10 @@ type lut interface {
 	lut1D | lut3D
 }
 
-func transform(input, output Space, cols color.Color) color.Color {
+func transform(input, output ColorSpace, cols color.Color) color.Color {
 
 	// if the colour spaces match or one isn't declared
-	if input.Space == output.Space || (input == Space{}) {
+	if input.ColorSpace == output.ColorSpace || (input == ColorSpace{}) {
 		return cols
 	}
 
@@ -60,7 +60,7 @@ func transform(input, output Space, cols color.Color) color.Color {
 	return tf(cols)
 }
 
-func getTransform(input, output Space) func(color.Color) color.Color {
+func getTransform(input, output ColorSpace) func(color.Color) color.Color {
 
 	/*
 
@@ -87,7 +87,7 @@ func getTransform(input, output Space) func(color.Color) color.Color {
 	// we get an input output and transform type
 	// decide which one takes precedence
 
-	return matrixTransform(RGBToXYZ[input.Space], XYZtoRGB[output.Space])
+	return matrixTransform(RGBToXYZ[input.ColorSpace], XYZtoRGB[output.ColorSpace])
 }
 
 func inverse(c color.Color) color.Color {

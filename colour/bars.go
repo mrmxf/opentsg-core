@@ -7,12 +7,12 @@ import (
 )
 
 type bar struct {
-	Space Space
+	Space ColorSpace
 }
 
 type bars struct {
 	width float64
-	color ColorSpace
+	color Color
 }
 
 var ( /*
@@ -86,7 +86,7 @@ func (br bar) generate2(canvas Image) {
 		twidth += f.width * float64(b.X)
 		area := image.Rect(int(w), int(0), int(w+f.width*float64(b.X)), b.Y)
 		fill := f.color
-		fill.UpdateSpace(br.Space)
+		fill.UpdateColorSpace(br.Space)
 		/*	fmt.Println(fill)
 			fmt.Println(fill.RGBA())
 			R, G, B, _ := fill.RGBA()

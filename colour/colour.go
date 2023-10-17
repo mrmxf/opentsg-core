@@ -63,22 +63,22 @@ func testrun2() {
 	*/
 
 	base := image.NewNRGBA64(image.Rect(0, 0, 2000, 2000))
-	noSpace := Space{Space: "rec709"}
+	noSpace := ColorSpace{ColorSpace: "rec709"}
 	noChange := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
 	b := bar{Space: noSpace}
 	b.generate2(noChange)
 
-	changeSpace := Space{Space: "rec709"}
+	changeSpace := ColorSpace{ColorSpace: "rec709"}
 	changeYCb := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
 	cb := bar{Space: changeSpace}
 	cb.generateYCbCr(changeYCb)
 
-	change601 := Space{Space: "rec601"}
+	change601 := ColorSpace{ColorSpace: "rec601"}
 	chang601 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
 	cb601 := bar{Space: change601}
 	cb601.generate2(chang601)
 
-	change709 := Space{Space: "rec601"}
+	change709 := ColorSpace{ColorSpace: "rec601"}
 	chang709 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
 	cb709 := bar{Space: change709}
 	cb709.generateYCbCr(chang709)
@@ -100,22 +100,22 @@ func testrun2020() {
 	*/
 
 	base := image.NewNRGBA64(image.Rect(0, 0, 2000, 2000))
-	noSpace := Space{Space: "rec2020"}
+	noSpace := ColorSpace{ColorSpace: "rec2020"}
 	noChange := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
 	b := bar{Space: noSpace}
 	b.generate2(noChange)
 
-	changeSpace := Space{Space: "rec709"}
+	changeSpace := ColorSpace{ColorSpace: "rec709"}
 	img709 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
 	cb := bar{Space: changeSpace}
 	cb.generate2(img709)
 
-	change601 := Space{Space: "rec601"}
+	change601 := ColorSpace{ColorSpace: "rec601"}
 	chang601 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
 	cb601 := bar{Space: change601}
 	cb601.generate2(chang601)
 
-	change709 := Space{Space: "p3"}
+	change709 := ColorSpace{ColorSpace: "p3"}
 	changP3 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
 	cb709 := bar{Space: change709}
 	cb709.generate2(changP3)
@@ -137,22 +137,22 @@ func testrun709() {
 	*/
 
 	base := image.NewNRGBA64(image.Rect(0, 0, 2000, 2000))
-	noSpace := Space{Space: "rec709"}
+	noSpace := ColorSpace{ColorSpace: "rec709"}
 	noChange := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	b := bar{Space: Space{Space: "rec2020"}}
+	b := bar{Space: ColorSpace{ColorSpace: "rec2020"}}
 	b.generate2(noChange)
 
-	changeSpace := Space{Space: "rec709"}
+	changeSpace := ColorSpace{ColorSpace: "rec709"}
 	img709 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
 	cb := bar{Space: changeSpace}
 	cb.generate2(img709)
 
-	change601 := Space{Space: "rec601"}
+	change601 := ColorSpace{ColorSpace: "rec601"}
 	chang601 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
 	cb601 := bar{Space: change601}
 	cb601.generate2(chang601)
 
-	change709 := Space{Space: "p3"}
+	change709 := ColorSpace{ColorSpace: "p3"}
 	changP3 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
 	cb709 := bar{Space: change709}
 	cb709.generate2(changP3)
@@ -170,20 +170,20 @@ func testrun709() {
 type CNRGBA64 struct {
 	// color.NRGBA64
 	R, G, B, A uint16
-	Space      Space
+	Space      ColorSpace
 }
 
-type ColorSpace interface {
+type Color interface {
 	color.Color
-	GetSpace() Space
-	UpdateSpace(Space)
+	GetColorSpace() ColorSpace
+	UpdateColorSpace(ColorSpace)
 }
 
-func (c *CNRGBA64) GetSpace() Space {
+func (c *CNRGBA64) GetColorSpace() ColorSpace {
 	return c.Space
 }
 
-func (c *CNRGBA64) UpdateSpace(s Space) {
+func (c *CNRGBA64) UpdateColorSpace(s ColorSpace) {
 	c.Space = s
 }
 
@@ -193,14 +193,14 @@ func (c *CNRGBA64) RGBA() (R, G, B, A uint32) {
 
 type CYCbCr struct {
 	Y, Cb, Cr uint8
-	Space     Space
+	Space     ColorSpace
 }
 
-func (c *CYCbCr) GetSpace() Space {
+func (c *CYCbCr) GetSpace() ColorSpace {
 	return c.Space
 }
 
-func (c *CYCbCr) UpdateSpace(s Space) {
+func (c *CYCbCr) UpdateSpace(s ColorSpace) {
 	c.Space = s
 }
 

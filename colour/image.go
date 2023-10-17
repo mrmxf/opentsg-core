@@ -7,10 +7,10 @@ import (
 )
 
 /*
-Space will need some methods as transforms get more complicated
+ColorSpace will need some methods as transforms get more complicated
 */
-type Space struct {
-	Space string
+type ColorSpace struct {
+	ColorSpace string
 	// Primaries let the space be declared as a string and the primaries
 	// be sued for generating transformation matrices.
 	// Have two seperate maps for data points
@@ -27,7 +27,7 @@ type XY struct {
 }
 
 type Image interface {
-	Space() Space
+	Space() ColorSpace
 	draw.Image // Draw include Set
 }
 
@@ -50,7 +50,7 @@ any textbox
 
 type NRGB64 struct {
 	base  *image.NRGBA64
-	space Space
+	space ColorSpace
 }
 
 /*
@@ -61,7 +61,7 @@ My current idea is using interface for NRGBa for our own colour tyoe that applie
 replacing the interface with one that returns the colour space for prosperity
 */
 
-func NewNRGBA64(s Space, r image.Rectangle) Image {
+func NewNRGBA64(s ColorSpace, r image.Rectangle) Image {
 
 	base := image.NewNRGBA64(r)
 
@@ -73,7 +73,7 @@ func (n NRGB64) Bounds() image.Rectangle {
 	return n.base.Bounds()
 }
 
-func (n NRGB64) Space() Space {
+func (n NRGB64) Space() ColorSpace {
 	return n.space
 }
 
@@ -99,8 +99,8 @@ func (n NRGB64) ColorModel() color.Model {
 func (n NRGB64) Set(x int, y int, c color.Color) {
 
 	// update the colour if it has an explicit colour space
-	if cmid, ok := c.(ColorSpace); ok {
-		c = transform(cmid.GetSpace(), n.space, c)
+	if cmid, ok := c.(Color); ok {
+		c = transform(cmid.GetColorSpace(), n.space, c)
 	}
 
 	n.base.Set(x, y, c)
