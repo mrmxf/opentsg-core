@@ -10,20 +10,24 @@ import (
 ColorSpace will need some methods as transforms get more complicated
 */
 type ColorSpace struct {
-	ColorSpace string
+	ColorSpace string `json:"ColorSpace,omitempty" yaml:"ColorSpace,omitempty"`
 	// Primaries let the space be declared as a string and the primaries
 	// be sued for generating transformation matrices.
 	// Have two seperate maps for data points
-	TransformType string
-	Primaries     Primaries
+	TransformType string    `json:"TransformType,omitempty" yaml:"TransformType,omitempty"`
+	Primaries     Primaries `json:"Primaries,omitempty" yaml:"Primaries,omitempty"`
 }
 
 type Primaries struct {
-	Red, Green, Blue, WhitePoint XY
+	Red        XY `json:"Red,omitempty" yaml:"Red,omitempty"`
+	Green      XY `json:"Green,omitempty" yaml:"Green,omitempty"`
+	Blue       XY `json:"Blue,omitempty" yaml:"Blue,omitempty"`
+	WhitePoint XY `json:"WhitePoint,omitempty" yaml:"WhitePoint,omitempty"`
 }
 
 type XY struct {
-	X, Y int
+	X int `json:"X,omitempty" yaml:"X,omitempty"`
+	Y int `json:"Y,omitempty" yaml:"Y,omitempty"`
 }
 
 type Image interface {
@@ -99,7 +103,8 @@ func (n NRGB64) ColorModel() color.Model {
 func (n NRGB64) Set(x int, y int, c color.Color) {
 
 	// update the colour if it has an explicit colour space
-	if cmid, ok := c.(Color); ok {
+	// and the base image is using colour spaces
+	if cmid, ok := c.(Color); ok && (n.space != ColorSpace{}) {
 		c = transform(cmid.GetColorSpace(), n.space, c)
 	}
 

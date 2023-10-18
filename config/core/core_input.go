@@ -115,7 +115,7 @@ func (b *base) factoryInit(jsonFactory factory, path, parent string, positions [
 				return fmt.Errorf("0006 the alias %s is repeated, every alias is required to be unique", parent+f.Name)
 			}
 
-			// schemavalidation to sort between widgets and factories
+			// schema validation to sort between widgets and factories
 			factLines := make(validator.JSONLines)
 			err = validator.Liner(fileBytes, inputPath, "factory", factLines) // treat it as a factory update
 			if err != nil {

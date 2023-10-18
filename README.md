@@ -1,5 +1,15 @@
 # tpg core
 
+tpg-core contains all the engine and core functionality for running openTSG.
+
+## ColourSpace Documentation
+
+All images use the colour space module. It is an image.NRGBA64 wrapped with a colour space.
+These combine with the CNRGBA64 colours, which are the same as color.NRGBA64 but with a colourspace.
+When setting a colourspace aware image with a colour space aware colour, the colours are transformed,
+to match the destination (image) colourspace, on a per pixel basis. This is due to awrapping of the set method.
+
+Different transformation methods will be implemented. Currently matrix transformations are used
 
 ## Getting started
 

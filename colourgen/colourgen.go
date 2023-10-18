@@ -84,6 +84,8 @@ func HexToColour(colorCode string, space colour.ColorSpace) *colour.CNRGBA64 {
 	case regcssRGBA12.MatchString(colorCode):
 
 		return cssrgba12(colorCode)
+	default:
+		base = &colour.CNRGBA64{}
 	}
 
 	base.Space = space
