@@ -94,8 +94,8 @@ func flatmap(c *context.Context, tpigpath string) (canvasAndMask, error) {
 
 	// TODO add streamlined error checking
 	// take each area to start at 0,0 and cmpile them?
-	flatbase := imageGenerator(*c, image.Rect(segmentLayout.Dimensions.Flat.X0, segmentLayout.Dimensions.Flat.Y0, segmentLayout.Dimensions.Flat.X1, segmentLayout.Dimensions.Flat.Y1))
-	basemask := imageGenerator(*c, image.Rect(segmentLayout.Dimensions.Flat.X0, segmentLayout.Dimensions.Flat.Y0, segmentLayout.Dimensions.Flat.X1, segmentLayout.Dimensions.Flat.Y1))
+	flatbase := ImageGenerator(*c, image.Rect(segmentLayout.Dimensions.Flat.X0, segmentLayout.Dimensions.Flat.Y0, segmentLayout.Dimensions.Flat.X1, segmentLayout.Dimensions.Flat.Y1))
+	basemask := ImageGenerator(*c, image.Rect(segmentLayout.Dimensions.Flat.X0, segmentLayout.Dimensions.Flat.Y0, segmentLayout.Dimensions.Flat.X1, segmentLayout.Dimensions.Flat.Y1))
 	// create the empty mask here. Keep it as empty as we want only bits that match the
 	// geometry layout.
 
@@ -168,7 +168,7 @@ func Carve(c *context.Context, canvas draw.Image, target []string) []ImageLocati
 
 		count := 0
 		for name, ct := range carveTargets {
-			carved := imageGenerator(*c, ct.carveSize)
+			carved := ImageGenerator(*c, ct.carveSize)
 
 			for _, carve := range ct.Layout {
 				draw.Draw(carved, carve.destination, canvas, carve.target.Min.Add(ct.offset), draw.Src)

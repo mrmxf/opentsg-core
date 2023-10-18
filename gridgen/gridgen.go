@@ -57,7 +57,7 @@ func baseGen(c *context.Context, geomCanvas draw.Image) (draw.Image, error) {
 		// based on type do this and use aces as increased fidelity?
 		canvasSize := image.Rect(0, 0, s.X, s.Y)
 
-		canvas = imageGenerator(*c, canvasSize)
+		canvas = ImageGenerator(*c, canvasSize)
 	} else {
 		canvas = geomCanvas
 	}
@@ -91,7 +91,7 @@ func baseGen(c *context.Context, geomCanvas draw.Image) (draw.Image, error) {
 	return canvas, nil
 }
 
-func imageGenerator(c context.Context, canvasSize image.Rectangle) draw.Image {
+func ImageGenerator(c context.Context, canvasSize image.Rectangle) draw.Image {
 	base := imageType(c)
 	if base == "ACES" {
 
@@ -168,7 +168,7 @@ func gridGen(c *context.Context, geomCanvas canvasAndMask) (draw.Image, error) {
 
 	// if there is a global mask apply it
 	if (geomCanvas != canvasAndMask{}) {
-		base := imageGenerator(*c, canvas.Bounds())
+		base := ImageGenerator(*c, canvas.Bounds())
 		draw.DrawMask(base, base.Bounds(), geomCanvas.canvas, image.Point{}, geomCanvas.mask, image.Point{}, draw.Src)
 
 		return base, nil
@@ -382,12 +382,12 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 		return generatedGridInfo, fmt.Errorf(invalidGrid, gridString)
 	}
 	// generate the image based on the user input to ensure continuity
-	generatedGridInfo.GImage = imageGenerator(*c, image.Rect(0, 0, generatedGridInfo.w, generatedGridInfo.h))
+	generatedGridInfo.GImage = ImageGenerator(*c, image.Rect(0, 0, generatedGridInfo.w, generatedGridInfo.h))
 
 	mask := (*c).Value(tilemaskkey)
 	if mask != nil {
 		mask := mask.(draw.Image)
-		maskdest := imageGenerator(*c, image.Rect(0, 0, generatedGridInfo.w, generatedGridInfo.h))
+		maskdest := ImageGenerator(*c, image.Rect(0, 0, generatedGridInfo.w, generatedGridInfo.h))
 		draw.Draw(maskdest, maskdest.Bounds(), mask, image.Point{generatedGridInfo.X, generatedGridInfo.Y}, draw.Src)
 		generatedGridInfo.GMask = maskdest
 	}

@@ -148,8 +148,8 @@ func imageToKeyMap(toScan *image.NRGBA64, c *context.Context) (map[string]artGri
 
 		// add 1 to include the full range of the image
 		// update this to be generic for the different image types
-		result := imageGenerator(*c, image.Rect(0, 0, maxX-minX+1, maxY-minY+1))
-		mask := imageGenerator(*c, image.Rect(0, 0, maxX-minX+1, maxY-minY+1))
+		result := ImageGenerator(*c, image.Rect(0, 0, maxX-minX+1, maxY-minY+1))
+		mask := ImageGenerator(*c, image.Rect(0, 0, maxX-minX+1, maxY-minY+1))
 
 		// find the rgba value of the key
 		r, g, b, a := visitKey(scanPix, image.Point{minX + int(float64(maxX-minX)/2.0), minY + int(float64(maxY-minY)/2.0)}, scanBounds, target)
