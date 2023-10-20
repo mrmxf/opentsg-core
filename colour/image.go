@@ -65,7 +65,7 @@ My current idea is using interface for NRGBa for our own colour tyoe that applie
 replacing the interface with one that returns the colour space for prosperity
 */
 
-func NewNRGBA64(s ColorSpace, r image.Rectangle) Image {
+func NewNRGBA64(s ColorSpace, r image.Rectangle) *NRGB64 {
 
 	base := image.NewNRGBA64(r)
 

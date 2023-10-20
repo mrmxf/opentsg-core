@@ -8,6 +8,9 @@ import (
 	"os"
 )
 
+// maxAlpha is the maximum color value returned by image.Color.RGBA.
+const maxAlpha = 1<<16 - 1
+
 /*
 
 basic draw function smpte ramps for example
@@ -206,4 +209,106 @@ func (c *CYCbCr) UpdateSpace(s ColorSpace) {
 
 func (c *CYCbCr) RGBA() (R, G, B, A uint32) {
 	return color.YCbCr{Y: c.Y, Cb: c.Cb, Cr: c.Cr}.RGBA()
+}
+
+// Draw calls DrawMask with a nil mask.
+func Draw(dst Image, r image.Rectangle, src image.Image, sp image.Point, op draw.Op) {
+	DrawMask(dst, r, src, sp, nil, image.Point{}, op)
+}
+
+// DrawMask aligns r.Min in dst with sp in src and mp in mask and then replaces the rectangle r
+// in dst with the result of a Porter-Duff composition. A nil mask is treated as opaque.
+func DrawMask(dst Image, r image.Rectangle, src image.Image, sp image.Point, mask image.Image, mp image.Point, op draw.Op) {
+
+	switch dst.(type) {
+	case *NRGB64:
+		// follow the draw.DrawMask generic code
+		// with a few slight differences to ensure colour space is preserved.
+
+		clip(dst, &r, src, &sp, mask, &mp)
+		if r.Empty() {
+			return
+		}
+
+		x0, x1, dx := r.Min.X, r.Max.X, 1
+		y0, y1, dy := r.Min.Y, r.Max.Y, 1
+		//set the colour to be colour space aware
+		var out CNRGBA64
+		sy := sp.Y + y0 - r.Min.Y
+		my := mp.Y + y0 - r.Min.Y
+		for y := y0; y != y1; y, sy, my = y+dy, sy+dy, my+dy {
+			sx := sp.X + x0 - r.Min.X
+			mx := mp.X + x0 - r.Min.X
+			for x := x0; x != x1; x, sx, mx = x+dx, sx+dx, mx+dx {
+				ma := uint32(maxAlpha)
+				if mask != nil {
+					_, _, _, ma = mask.At(mx, my).RGBA()
+				}
+				switch {
+				case ma == 0:
+					if op == draw.Over {
+						// No-op.
+					} else { // reset to a transparent pixel
+						dst.Set(x, y, color.Transparent)
+					}
+				case ma == maxAlpha && op == draw.Src:
+					dst.Set(x, y, src.At(sx, sy))
+				default:
+					sr, sg, sb, sa := src.At(sx, sy).RGBA()
+					if op == draw.Over {
+						dr, dg, db, da := dst.At(x, y).RGBA()
+						a := maxAlpha - (sa * ma / maxAlpha)
+						out.R = uint16((dr*a + sr*ma) / maxAlpha)
+						out.G = uint16((dg*a + sg*ma) / maxAlpha)
+						out.B = uint16((db*a + sb*ma) / maxAlpha)
+						out.A = uint16((da*a + sa*ma) / maxAlpha)
+					} else {
+						out.R = uint16(sr * ma / maxAlpha)
+						out.G = uint16(sg * ma / maxAlpha)
+						out.B = uint16(sb * ma / maxAlpha)
+						out.A = uint16(sa * ma / maxAlpha)
+					}
+
+					// assign the colour space if there is one
+					if cspace, ok := src.At(sx, sy).(*CNRGBA64); ok {
+						out.Space = cspace.Space
+					}
+					// The third argument is &out instead of out (and out is
+					// declared outside of the inner loop) to avoid the implicit
+					// conversion to color.Color here allocating memory in the
+					// inner loop if sizeof(color.RGBA64) > sizeof(uintptr).
+					dst.Set(x, y, &out)
+				}
+			}
+		}
+
+	default:
+		draw.DrawMask(dst, r, src, sp, mask, mp, op)
+
+	}
+
+}
+
+// clip clips r against each image's bounds (after translating into the
+// destination image's coordinate space) and shifts the points sp and mp by
+// the same amount as the change in r.Min.
+// This the same as the draw standard library
+func clip(dst Image, r *image.Rectangle, src image.Image, sp *image.Point, mask image.Image, mp *image.Point) {
+	orig := r.Min
+	*r = r.Intersect(dst.Bounds())
+	*r = r.Intersect(src.Bounds().Add(orig.Sub(*sp)))
+	if mask != nil {
+		*r = r.Intersect(mask.Bounds().Add(orig.Sub(*mp)))
+	}
+	dx := r.Min.X - orig.X
+	dy := r.Min.Y - orig.Y
+	if dx == 0 && dy == 0 {
+		return
+	}
+	sp.X += dx
+	sp.Y += dy
+	if mp != nil {
+		mp.X += dx
+		mp.Y += dy
+	}
 }

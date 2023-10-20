@@ -90,7 +90,7 @@ type widgetContents struct {
 	Tag      string
 }
 
-// AliasIdentity is the name and zposition of a widget. Where zposition is the widgets poisition in the global array of widgets
+// AliasIdentity is the name and zposition of a widget. Where zposition is the widgets position in the global array of widgets
 type AliasIdentity struct {
 	Alias string
 	ZPos  int

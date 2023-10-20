@@ -179,7 +179,7 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 			}
 
 			newChild, err := getChildren(childFactory, dotPath, dotExt, additions, metadata)
-			if err != nil {
+			if err != nil { // quit this run after finding the errors
 				genErrs = append(genErrs, err)
 
 				continue
@@ -187,6 +187,7 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 
 			// run the generate first if there is any
 			// do not run if the dot path is targeting its children
+			// as the children are updated afterwards
 			if len(childFactory.Generate) > 0 && dotExt == "" {
 				errs := b.factoryGenerateWidgets(childFactory.Generate, dotPath+".", metadata, append(positions, creatCount), zPos)
 				genErrs = append(genErrs, errs...)
@@ -248,7 +249,6 @@ func (b *base) widgetHandler(createUpdate map[string]any, dotPath, dotExt string
 		}
 
 		return []jsonUpdate{{dotPath, createUpdate}}, nil
-
 	}
 
 	err := b.frameBytesAdder(createUpdate, widgBase, dotPath, append(positions, createCount), zPos)
