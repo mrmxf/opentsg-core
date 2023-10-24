@@ -31,6 +31,8 @@ clogrc/core
 !action/testdata/generate/*.json
 !action/testdata/results/*.json
 
+!colour/testdata/draw/*.png
+
 #Return our schema
 !config/jsonschema/baseschema.json
 !config/jsonschema/basefacschema.json
