@@ -4,6 +4,10 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
+	"image/png"
+	"io"
+
+	"golang.org/x/image/tiff"
 )
 
 /*
@@ -123,3 +127,27 @@ because the draw removes the colour transformation from set.
 The only issue is add image, but this will be a beast unto itself
 
 */
+
+func PngEncode(w io.Writer, m image.Image) error {
+
+	// cut out the NRGB64 wrapper as png
+	// doesn't know how to handle it correctly
+	// and it changes the expected values when alpha is not 0xffff
+	if mid, ok := m.(*NRGB64); ok {
+		m = mid.base
+	}
+
+	return png.Encode(w, m)
+}
+
+func TiffEncode(w io.Writer, m image.Image, opt *tiff.Options) error {
+
+	// cut out the NRGB64 wrapper as tiff
+	// doesn't know how to handle it correctly
+	// and it changes the expected values when alpha is not 0xffff
+	if mid, ok := m.(*NRGB64); ok {
+		m = mid.base
+	}
+
+	return tiff.Encode(w, m, opt)
+}

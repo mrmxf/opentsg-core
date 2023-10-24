@@ -6,7 +6,9 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
+	"image/png"
 	"math/rand"
+	"os"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -91,42 +93,43 @@ func TestDraw(t *testing.T) {
 		})
 	}
 
-	/*
-		testColours := []CNRGBA64{{R: 35340, A: 0xffff}, {G: 30000, B: 40000, A: 0xf0f0}, {R: 0xffff, G: 0xffff, B: 0xffff}}
-		target := []string{"fullalpha.tiff", "partialalpha.tiff", "noalpha.tiff"}
+	testColours := []CNRGBA64{{R: 35340, A: 0xffff}, {G: 30000, B: 40000, A: 0xf0f0}, {R: 0xffff, G: 0xffff, B: 0xffff}}
 
-		for i, tcol := range testColours {
-			colourImplementation := NewNRGBA64(ColorSpace{ColorSpace: "rec2020"}, image.Rect(0, 0, 1000, 1000))
-			Draw(colourImplementation, colourImplementation.Bounds(), &image.Uniform{&tcol}, image.Point{}, draw.Src)
+	target := []string{"fullalpha.png", "partialalpha.png", "noalpha.png"}
 
-			baseFile, _ := os.Open("./testdata/draw/" + target[i])
-			// tiff.Encode(baseFile, colourImplementation, &tiff.Options{})
-			baseImage, _ := tiff.Decode(baseFile)
+	for i, tcol := range testColours {
+		colourImplementation := NewNRGBA64(ColorSpace{ColorSpace: "rec2020"}, image.Rect(0, 0, 1000, 1000))
+		Draw(colourImplementation, colourImplementation.Bounds(), &image.Uniform{&tcol}, image.Point{}, draw.Src)
+		//	goImplementation := image.NewNRGBA64(image.Rect(0, 0, 1000, 1000))
+		//Draw(goImplementation, goImplementation.Bounds(), &image.Uniform{&tcol}, image.Point{}, draw.Src)
 
-			//	testFormat := NewNRGBA64(ColorSpace{}, baseImage.Bounds())
-			//	Draw(testFormat, testFormat.Bounds(), baseImage, image.Point{}, draw.Over)
-			//
-			hnormal := sha256.New()
-			htest := sha256.New()
-			//hnormal.Write(baseImage)
-			htest.Write(colourImplementation.Pix())
+		baseFile, _ := os.Open("./testdata/draw/" + target[i])
 
+		//PngEncode(basePng, colourImplementation.base)
+		baseImage, _ := png.Decode(baseFile)
+
+		testFormat := image.NewNRGBA64(baseImage.Bounds())
+		Draw(testFormat, testFormat.Bounds(), baseImage, image.Point{}, draw.Src)
+		//
+		hnormal := sha256.New()
+		htest := sha256.New()
+		hnormal.Write(testFormat.Pix)
+		htest.Write(colourImplementation.Pix())
+
+		/*
 			fmt.Println(baseImage.At(0, 0).RGBA())
+			fmt.Println(testFormat.At(0, 0).RGBA())
 			fmt.Println(colourImplementation.At(0, 0).RGBA())
-			/*	for c, j := range testFormat.Pix {
-				if colourImplementation.Pix()[c] != j {
-					fmt.Println(j, colourImplementation.Pix()[c], c)
-				}
-			}
+		*/
 
-			Convey("Checking that the go and colour implementations of draw produce the same result, when no colour space is involved", t, func() {
-				Convey(fmt.Sprintf("Run using a colour of %v", "baseColour"), func() {
-					Convey("The hashes of the image are identical", func() {
-						So(htest.Sum(nil), ShouldResemble, hnormal.Sum(nil))
-					})
+		Convey("Checking that the transformation produces the expected results", t, func() {
+			Convey(fmt.Sprintf("Run checking %v", target[i]), func() {
+				Convey("The hashes of the image are identical", func() {
+					So(htest.Sum(nil), ShouldResemble, hnormal.Sum(nil))
 				})
 			})
-		}*/
+		})
+	}
 
 	/*
 		f, _ := os.Create("./testdata/colour.png")
