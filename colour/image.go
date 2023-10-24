@@ -81,6 +81,10 @@ func (n NRGB64) Space() ColorSpace {
 	return n.space
 }
 
+func (n NRGB64) Pix() []uint8 {
+	return n.base.Pix
+}
+
 func (n NRGB64) At(x, y int) color.Color {
 	/* can wrap
 		NRGBA 64 colour as an tsg.colour

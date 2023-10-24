@@ -116,10 +116,10 @@ func TestWidgetRun(t *testing.T) {
 	hnormal := sha256.New()
 	htest := sha256.New()
 	hnormal.Write(readImage.Pix)
-	htest.Write(canvas.(*image.NRGBA64).Pix)
+	htest.Write(canvas.(*colour.NRGB64).Pix())
 
-	//td, _ := os.Create("r.png")
-	//png.Encode(td, canvas)
+	// td, _ := os.Create("r.png")
+	// png.Encode(td, canvas)
 
 	Convey("Checking that generator runs for a single function with a map of 4 colours", t, func() {
 		Convey("Run using ./collater.json for the image widgets", func() {
@@ -175,9 +175,9 @@ func TestZposRun(t *testing.T) {
 		hnormal := sha256.New()
 		htest := sha256.New()
 		hnormal.Write(readImage.Pix)
-		htest.Write(canvas.(*image.NRGBA64).Pix)
+		htest.Write(canvas.(*colour.NRGB64).Pix())
 
-		// td, _ := os.Create("r.png")
+		// td, _ := os.Create(ftarget + "r.png")
 		// png.Encode(td, canvas)
 
 		Convey("Checking that generator runs for the zOrder across two functions", t, func() {
@@ -239,9 +239,9 @@ func TestErrorZpos(t *testing.T) {
 		hnormal := sha256.New()
 		htest := sha256.New()
 		hnormal.Write(readImage.Pix)
-		htest.Write(canvas.(*image.NRGBA64).Pix)
+		htest.Write(canvas.(*colour.NRGB64).Pix())
 
-		// td, _ := os.Create(fmt.Sprintf("%vr.png", i))
+		// td, _ := os.Create(fmt.Sprintf("%vr.png", ftarget))
 		// png.Encode(td, canvas)
 
 		Convey("Checking that generator runs in the zOrder when errors are emitted", t, func() {
@@ -265,7 +265,7 @@ type test struct {
 func (tt test) Generate(i draw.Image, t ...any) error {
 	c := colourgen.HexToColour(tt.Colour, colour.ColorSpace{})
 	// fmt.Println(tt.Fill)
-	draw.Draw(i.(*image.NRGBA64), i.Bounds(), &image.Uniform{c}, image.Point{}, draw.Src)
+	draw.Draw(i.(*colour.NRGB64), i.Bounds(), &image.Uniform{c}, image.Point{}, draw.Src)
 
 	return nil
 }

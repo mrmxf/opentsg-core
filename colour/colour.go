@@ -212,13 +212,13 @@ func (c *CYCbCr) RGBA() (R, G, B, A uint32) {
 }
 
 // Draw calls DrawMask with a nil mask.
-func Draw(dst Image, r image.Rectangle, src image.Image, sp image.Point, op draw.Op) {
+func Draw(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point, op draw.Op) {
 	DrawMask(dst, r, src, sp, nil, image.Point{}, op)
 }
 
 // DrawMask aligns r.Min in dst with sp in src and mp in mask and then replaces the rectangle r
 // in dst with the result of a Porter-Duff composition. A nil mask is treated as opaque.
-func DrawMask(dst Image, r image.Rectangle, src image.Image, sp image.Point, mask image.Image, mp image.Point, op draw.Op) {
+func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point, mask image.Image, mp image.Point, op draw.Op) {
 
 	switch dst.(type) {
 	case *NRGB64:
@@ -255,8 +255,16 @@ func DrawMask(dst Image, r image.Rectangle, src image.Image, sp image.Point, mas
 					dst.Set(x, y, src.At(sx, sy))
 				default:
 					sr, sg, sb, sa := src.At(sx, sy).RGBA()
+					if cspace, ok := src.At(sx, sy).(*CNRGBA64); ok {
+						// transform the colour before applying it
+						tCol := transform(cspace.Space, dst.(*NRGB64).space, src.At(sx, sy))
+						sr, sg, sb, sa = tCol.RGBA()
+					}
+
 					if op == draw.Over {
+
 						dr, dg, db, da := dst.At(x, y).RGBA()
+
 						a := maxAlpha - (sa * ma / maxAlpha)
 						out.R = uint16((dr*a + sr*ma) / maxAlpha)
 						out.G = uint16((dg*a + sg*ma) / maxAlpha)
@@ -293,7 +301,7 @@ func DrawMask(dst Image, r image.Rectangle, src image.Image, sp image.Point, mas
 // destination image's coordinate space) and shifts the points sp and mp by
 // the same amount as the change in r.Min.
 // This the same as the draw standard library
-func clip(dst Image, r *image.Rectangle, src image.Image, sp *image.Point, mask image.Image, mp *image.Point) {
+func clip(dst draw.Image, r *image.Rectangle, src image.Image, sp *image.Point, mask image.Image, mp *image.Point) {
 	orig := r.Min
 	*r = r.Intersect(dst.Bounds())
 	*r = r.Intersect(src.Bounds().Add(orig.Sub(*sp)))

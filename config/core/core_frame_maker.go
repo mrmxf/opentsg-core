@@ -504,7 +504,7 @@ func (b *base) generateAction(genName []map[string]string, action, targetName, p
 	// get the data then add all the dimensions
 	toAdd := make(map[string]data)
 
-	// TODO push it through with the schema so we know the error doesn't need checking.
+	// @TODO push it through with the schema so we know the error doesn't need checking.
 	if err := yaml.Unmarshal(updateData, &toAdd); err != nil {
 		return []error{fmt.Errorf("0033 extracting data for %s : ", parent+targetName)}
 	}
@@ -703,7 +703,8 @@ func (r *recurseData) recurseDataArray(arrayPos int) {
 				arrayPosition += (r.positions[n.key]) * r.offsets[j]
 				pos[j] = r.positions[n.key]
 			}
-			// no error handling here as the keys are made here
+			// no error handling here as the keys are made within the function
+			// so they never are missed out
 			st, _ := mustache.Render(r.key, r.positions)
 			r.results = append(r.results, arrayValues{st, arrayPosition, pos})
 		}
