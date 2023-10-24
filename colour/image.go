@@ -107,6 +107,10 @@ func (n NRGB64) ColorModel() color.Model {
 	return n.base.ColorModel()
 }
 
+func (n NRGB64) BaseImage() *image.NRGBA64 {
+	return n.base
+}
+
 // utilise set for draw
 func (n NRGB64) Set(x int, y int, c color.Color) {
 

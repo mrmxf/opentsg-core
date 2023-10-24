@@ -4,7 +4,6 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	"image/png"
 	"os"
 )
 
@@ -92,7 +91,7 @@ func testrun2() {
 	Draw(base, image.Rect(1000, 1000, 2000, 2000), chang709, image.Point{}, draw.Over)
 
 	f, _ := os.Create("./testdata/all2.png")
-	png.Encode(f, base)
+	PngEncode(f, base)
 
 }
 
@@ -129,7 +128,7 @@ func testrun2020() {
 	Draw(base, image.Rect(1000, 1000, 2000, 2000), chang601, image.Point{}, draw.Over)
 
 	f, _ := os.Create("./testdata/all2020.png")
-	png.Encode(f, base)
+	PngEncode(f, base)
 
 }
 
@@ -166,7 +165,7 @@ func testrun709() {
 	Draw(base, image.Rect(1000, 1000, 2000, 2000), chang601, image.Point{}, draw.Over)
 
 	f, _ := os.Create("./testdata/all709.png")
-	png.Encode(f, base)
+	PngEncode(f, base)
 
 }
 

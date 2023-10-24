@@ -6,17 +6,16 @@ import (
 	"fmt"
 	"image"
 	"image/draw"
-	"image/png"
 	"io"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strings"
 
 	"github.com/cbroglie/mustache"
 	"github.com/mmTristan/opentsg-core/colour"
 	errhandle "github.com/mmTristan/opentsg-core/errHandle"
-	"golang.org/x/image/tiff"
 
 	"github.com/mrmxf/opentsg-io/csvsave"
 	"github.com/mrmxf/opentsg-io/dpx"
@@ -61,7 +60,6 @@ func baseSaves() map[string]func(*os.File, draw.Image, int) error {
 	"PNG": WritePngFile,
 	"EXR": WriteExrFile,
 	"CSV": WriteCSVFile,
-	"7TH": WriteSthFile,
 } */
 
 func (tpg *opentsg) savefile(filename, framenumber string, base draw.Image, bitdepth int) error {
@@ -205,19 +203,32 @@ func WriteTiffFile(f *os.File, img draw.Image, empty int) error {
 		for y := bound.Min.Y; y < bound.Max.Y; y++ {
 			if _, _, _, A := img.At(x, y).RGBA(); A != 65535 {
 				// if there is one bit of transparency save with this method
-				return tiff.Encode(f, img, nil)
+				return colour.TiffEncode(f, img, nil)
 			}
 		}
 	}
 
+	switch canvas := img.(type) {
+	case *image.NRGBA64:
+
+		return tiffup.Encode(f, canvas)
+	case *colour.NRGB64:
+		return colour.TiffEncode(f, canvas.BaseImage(), nil)
+
+	default:
+		// return the alpha channel version anyway
+		//as at it will save the file and not crash
+		return colour.TiffEncode(f, img, nil)
+	}
+
 	// if it passes the transparency check save without
-	return tiffup.Encode(f, img.(*image.NRGBA64))
+	//return tiffup.Encode(f, img.(*image.NRGBA64))
 
 }
 
 // writePngFile saves the file as a png
 func WritePngFile(f *os.File, image draw.Image, empty int) error {
-	return png.Encode(f, image)
+	return colour.PngEncode(f, image)
 }
 
 func WriteExrFile(f *os.File, image draw.Image, empty int) error {
@@ -229,13 +240,29 @@ func WriteDPXFile(f *os.File, toDraw draw.Image, bit int) error {
 	if bit == 0 {
 		bit = 16
 	}
-
+	switch canvas := toDraw.(type) {
+	case *image.NRGBA64:
+		return dpx.Encode(f, canvas, &dpx.Options{Bitdepth: bit})
+	case *colour.NRGB64:
+		return dpx.Encode(f, canvas.BaseImage(), &dpx.Options{Bitdepth: bit})
+	default:
+		return fmt.Errorf("configuration error image of type %v can not be saved as a dpx", reflect.TypeOf(toDraw))
+	}
 	//assert the image here as
-	return dpx.Encode(f, toDraw.(*image.NRGBA64), &dpx.Options{Bitdepth: bit})
+	// 	return dpx.Encode(f, toDraw.(*image.NRGBA64), &dpx.Options{Bitdepth: bit})
 }
 
-func WriteCSVFile(file *os.File, img draw.Image, empty int) error {
+func WriteCSVFile(file *os.File, toDraw draw.Image, empty int) error {
 	filename := file.Name()
 
-	return csvsave.Encode(filename, img.(*image.NRGBA64))
+	switch canvas := toDraw.(type) {
+	case *image.NRGBA64:
+		return csvsave.Encode(filename, canvas)
+	case *colour.NRGB64:
+		return csvsave.Encode(filename, canvas.BaseImage())
+	default:
+		return fmt.Errorf("configuration error image of type %v can not be saved as a csv", reflect.TypeOf(toDraw))
+
+	}
+	// return csvsave.Encode(filename, img.(*image.NRGBA64))
 }
