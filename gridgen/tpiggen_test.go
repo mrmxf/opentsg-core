@@ -11,6 +11,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/mmTristan/opentsg-core/colour"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -76,7 +77,7 @@ func TestTpigGeometry(t *testing.T) {
 	}
 
 	// create a filler image with generic checkerboard
-	filler := image.NewNRGBA64(image.Rect(0, 0, 30, 30))
+	filler := colour.NewNRGBA64(colour.ColorSpace{}, image.Rect(0, 0, 30, 30))
 	colours := []color.Color{color.NRGBA64{R: 0xffff, A: 0xffff}, color.NRGBA64{G: 0xffff, A: 0xffff}}
 	for x := 0; x < 30; x += 10 {
 		for y := 0; y < 30; y += 10 {
@@ -99,7 +100,7 @@ func TestTpigGeometry(t *testing.T) {
 		htest := sha256.New()
 
 		hnormal.Write(readImage.Pix)
-		htest.Write(v.Image.(*image.NRGBA64).Pix)
+		htest.Write(v.Image.(*colour.NRGB64).Pix())
 		Convey("Checking the carved images match their expected tpig carving", t, func() {
 			Convey(fmt.Sprintf("comparing the result to %v", v.Location[0]), func() {
 				Convey("The hashes of the two images match exactly", func() {

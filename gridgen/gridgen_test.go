@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/mmTristan/opentsg-core/canvaswidget"
+	"github.com/mmTristan/opentsg-core/colour"
 	"github.com/mmTristan/opentsg-core/config/core"
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -48,7 +49,7 @@ func TestGrids(t *testing.T) {
 		hnormal := sha256.New()
 		htest := sha256.New()
 		hnormal.Write(readImage.Pix)
-		htest.Write(base.(*image.NRGBA64).Pix)
+		htest.Write(base.(*colour.NRGB64).Pix())
 
 		Convey("Checking the grids fit on the base testcard", t, func() {
 			Convey(fmt.Sprintf("using a %v, %v as the row and column counts", size.Y, size.X), func() {
@@ -171,7 +172,7 @@ func TestGridGen(t *testing.T) {
 		hnormal := sha256.New()
 		htest := sha256.New()
 		hnormal.Write(readImage.Pix)
-		htest.Write(myImage.(*image.NRGBA64).Pix)
+		htest.Write(myImage.(*colour.NRGB64).Pix())
 
 		Convey("Checking the widths of the lines are generated", t, func() {
 			Convey(fmt.Sprintf("using a width of %v linewidth", w), func() {
@@ -222,7 +223,7 @@ func TestArtKey(t *testing.T) {
 		testImage := image.NewNRGBA64(basetest.Bounds())
 		draw.Draw(testImage, testImage.Bounds(), basetest, image.Point{0, 0}, draw.Src)
 		hnormal.Write(testImage.Pix)
-		htest.Write(myImage.(*image.NRGBA64).Pix)
+		htest.Write(myImage.(*colour.NRGB64).Pix())
 
 		Convey("Checking the background image is scaled", t, func() {
 			Convey(fmt.Sprintf("using %s as the base image", filename), func() {
