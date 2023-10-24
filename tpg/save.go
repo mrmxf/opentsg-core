@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/cbroglie/mustache"
+	"github.com/mmTristan/opentsg-core/colour"
 	errhandle "github.com/mmTristan/opentsg-core/errHandle"
 	"golang.org/x/image/tiff"
 
@@ -163,7 +164,7 @@ func (tpg *opentsg) savefile(filename, framenumber string, base draw.Image, bitd
 	canvas, ok := base.(*image.NRGBA64)
 	if !ok { //set to nrgba64 if not ok
 		canvas = image.NewNRGBA64(base.Bounds())
-		draw.Draw(canvas, canvas.Bounds(), base, image.Point{}, draw.Src)
+		colour.Draw(canvas, canvas.Bounds(), base, image.Point{}, draw.Src)
 	}
 	pixB := canvas.Pix
 	// reset the file to the start for the hashreader

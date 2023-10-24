@@ -44,7 +44,7 @@ func TestGrids(t *testing.T) {
 		baseVals, _ := png.Decode(f)
 
 		readImage := image.NewNRGBA64(baseVals.Bounds())
-		draw.Draw(readImage, readImage.Bounds(), baseVals, image.Point{0, 0}, draw.Src)
+		colour.Draw(readImage, readImage.Bounds(), baseVals, image.Point{0, 0}, draw.Src)
 		// make a hash of the pixels of each image
 		hnormal := sha256.New()
 		htest := sha256.New()
@@ -167,7 +167,7 @@ func TestGridGen(t *testing.T) {
 		baseVals, _ := png.Decode(f)
 
 		readImage := image.NewNRGBA64(baseVals.Bounds())
-		draw.Draw(readImage, readImage.Bounds(), baseVals, image.Point{0, 0}, draw.Src)
+		colour.Draw(readImage, readImage.Bounds(), baseVals, image.Point{0, 0}, draw.Src)
 		// make a hash of the pixels of each image
 		hnormal := sha256.New()
 		htest := sha256.New()
@@ -207,7 +207,7 @@ func TestArtKey(t *testing.T) {
 		f, _ := os.Open("./testdata/base4k.png")
 		baseVals, _ := png.Decode(f)
 		readImage := image.NewNRGBA64(baseVals.Bounds())
-		draw.Draw(readImage, readImage.Bounds(), baseVals, image.Point{0, 0}, draw.Src)
+		colour.Draw(readImage, readImage.Bounds(), baseVals, image.Point{0, 0}, draw.Src)
 		// getWidth = func() float64 { return w }
 		fmt.Println(readImage.At(178, 1240))
 		valC := context.Background()
@@ -221,7 +221,7 @@ func TestArtKey(t *testing.T) {
 		fb, _ := os.Open(base[i])
 		basetest, _ := png.Decode(fb)
 		testImage := image.NewNRGBA64(basetest.Bounds())
-		draw.Draw(testImage, testImage.Bounds(), basetest, image.Point{0, 0}, draw.Src)
+		colour.Draw(testImage, testImage.Bounds(), basetest, image.Point{0, 0}, draw.Src)
 		hnormal.Write(testImage.Pix)
 		htest.Write(myImage.(*colour.NRGB64).Pix())
 

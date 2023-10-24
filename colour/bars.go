@@ -97,7 +97,7 @@ func (br bar) generate2(canvas Image) {
 			fmt.Println(color.YCbCrToRGB(uint8(math.Round(Y)), uint8(math.Round(cb)), uint8(math.Round(cr))))
 			fmt.Println(YCbCrToRGB(Y, cb, cr))*/
 		// canvas.Draw(area, f.color, draw.Src, br.Space)
-		draw.Draw(canvas, area, &image.Uniform{fill}, image.Point{}, draw.Src)
+		Draw(canvas, area, &image.Uniform{fill}, image.Point{}, draw.Src)
 
 		w += f.width * float64(b.X)
 	}
@@ -125,7 +125,7 @@ func (br bar) generateYCbCr(canvas Image) {
 		fill := &CYCbCr{Y: Y, Cb: cb, Cr: cr, Space: br.Space}
 
 		// canvas.Draw(area, f.color, draw.Src, br.Space)
-		draw.Draw(canvas, area, &image.Uniform{fill}, image.Point{}, draw.Src)
+		Draw(canvas, area, &image.Uniform{fill}, image.Point{}, draw.Src)
 
 		w += f.width * float64(b.X)
 	}

@@ -86,10 +86,10 @@ func testrun2() {
 	cb709 := bar{Space: change709}
 	cb709.generateYCbCr(chang709)
 
-	draw.Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
-	draw.Draw(base, image.Rect(1000, 0, 2000, 1000), changeYCb, image.Point{}, draw.Over)
-	draw.Draw(base, image.Rect(0, 1000, 1000, 2000), chang601, image.Point{}, draw.Over)
-	draw.Draw(base, image.Rect(1000, 1000, 2000, 2000), chang709, image.Point{}, draw.Over)
+	Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
+	Draw(base, image.Rect(1000, 0, 2000, 1000), changeYCb, image.Point{}, draw.Over)
+	Draw(base, image.Rect(0, 1000, 1000, 2000), chang601, image.Point{}, draw.Over)
+	Draw(base, image.Rect(1000, 1000, 2000, 2000), chang709, image.Point{}, draw.Over)
 
 	f, _ := os.Create("./testdata/all2.png")
 	png.Encode(f, base)
@@ -123,10 +123,10 @@ func testrun2020() {
 	cb709 := bar{Space: change709}
 	cb709.generate2(changP3)
 
-	draw.Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
-	draw.Draw(base, image.Rect(1000, 0, 2000, 1000), img709, image.Point{}, draw.Over)
-	draw.Draw(base, image.Rect(0, 1000, 1000, 2000), changP3, image.Point{}, draw.Over)
-	draw.Draw(base, image.Rect(1000, 1000, 2000, 2000), chang601, image.Point{}, draw.Over)
+	Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
+	Draw(base, image.Rect(1000, 0, 2000, 1000), img709, image.Point{}, draw.Over)
+	Draw(base, image.Rect(0, 1000, 1000, 2000), changP3, image.Point{}, draw.Over)
+	Draw(base, image.Rect(1000, 1000, 2000, 2000), chang601, image.Point{}, draw.Over)
 
 	f, _ := os.Create("./testdata/all2020.png")
 	png.Encode(f, base)
@@ -160,10 +160,10 @@ func testrun709() {
 	cb709 := bar{Space: change709}
 	cb709.generate2(changP3)
 
-	draw.Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
-	draw.Draw(base, image.Rect(1000, 0, 2000, 1000), img709, image.Point{}, draw.Over)
-	draw.Draw(base, image.Rect(0, 1000, 1000, 2000), changP3, image.Point{}, draw.Over)
-	draw.Draw(base, image.Rect(1000, 1000, 2000, 2000), chang601, image.Point{}, draw.Over)
+	Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
+	Draw(base, image.Rect(1000, 0, 2000, 1000), img709, image.Point{}, draw.Over)
+	Draw(base, image.Rect(0, 1000, 1000, 2000), changP3, image.Point{}, draw.Over)
+	Draw(base, image.Rect(1000, 1000, 2000, 2000), chang601, image.Point{}, draw.Over)
 
 	f, _ := os.Create("./testdata/all709.png")
 	png.Encode(f, base)

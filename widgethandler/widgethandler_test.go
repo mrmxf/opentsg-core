@@ -111,7 +111,7 @@ func TestWidgetRun(t *testing.T) {
 
 	// assign the colour to the correct type of image NGRBA64 and replace the colour values
 	readImage := image.NewNRGBA64(baseVals.Bounds())
-	draw.Draw(readImage, readImage.Bounds(), baseVals, image.Point{}, draw.Src)
+	colour.Draw(readImage, readImage.Bounds(), baseVals, image.Point{}, draw.Src)
 
 	hnormal := sha256.New()
 	htest := sha256.New()
@@ -170,7 +170,7 @@ func TestZposRun(t *testing.T) {
 
 		// assign the colour to the correct type of image NGRBA64 and replace the colour values
 		readImage := image.NewNRGBA64(baseVals.Bounds())
-		draw.Draw(readImage, readImage.Bounds(), baseVals, image.Point{}, draw.Src)
+		colour.Draw(readImage, readImage.Bounds(), baseVals, image.Point{}, draw.Src)
 
 		hnormal := sha256.New()
 		htest := sha256.New()
@@ -234,7 +234,7 @@ func TestErrorZpos(t *testing.T) {
 
 		// assign the colour to the correct type of image NGRBA64 and replace the colour values
 		readImage := image.NewNRGBA64(baseVals.Bounds())
-		draw.Draw(readImage, readImage.Bounds(), baseVals, image.Point{}, draw.Src)
+		colour.Draw(readImage, readImage.Bounds(), baseVals, image.Point{}, draw.Src)
 
 		hnormal := sha256.New()
 		htest := sha256.New()
@@ -265,7 +265,7 @@ type test struct {
 func (tt test) Generate(i draw.Image, t ...any) error {
 	c := colourgen.HexToColour(tt.Colour, colour.ColorSpace{})
 	// fmt.Println(tt.Fill)
-	draw.Draw(i.(*colour.NRGB64), i.Bounds(), &image.Uniform{c}, image.Point{}, draw.Src)
+	colour.Draw(i.(*colour.NRGB64), i.Bounds(), &image.Uniform{c}, image.Point{}, draw.Src)
 
 	return nil
 }
@@ -290,7 +290,7 @@ func (tt testhook) Generate(i draw.Image, t ...any) error {
 
 		return fmt.Errorf("%v", tt.Err)
 	}
-	draw.Draw(i, i.Bounds(), &image.Uniform{color.Black}, image.Point{}, draw.Src)
+	colour.Draw(i, i.Bounds(), &image.Uniform{color.Black}, image.Point{}, draw.Src)
 
 	return nil
 }

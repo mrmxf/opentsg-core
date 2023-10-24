@@ -13,6 +13,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/mmTristan/opentsg-core/colour"
 	"github.com/mmTristan/opentsg-core/config/core"
 )
 
@@ -126,7 +127,7 @@ func flatmap(c *context.Context, tpigpath string) (canvasAndMask, error) {
 		carved.Layout = append(carveSegements[t.Layout.Carve.Destination].Layout, carveshift{destination: carves, target: locs[i]})
 		carveSegements[t.Layout.Carve.Destination] = carved
 		// fill in the global base mask
-		draw.Draw(basemask, utilitySegements[i].Shape, &image.Uniform{color.NRGBA64{A: 0xffff}}, image.Point{}, draw.Src)
+		colour.Draw(basemask, utilitySegements[i].Shape, &image.Uniform{color.NRGBA64{A: 0xffff}}, image.Point{}, draw.Src)
 	}
 
 	for k, v := range carveSegements {
@@ -171,7 +172,7 @@ func Carve(c *context.Context, canvas draw.Image, target []string) []ImageLocati
 			carved := ImageGenerator(*c, ct.carveSize)
 
 			for _, carve := range ct.Layout {
-				draw.Draw(carved, carve.destination, canvas, carve.target.Min.Add(ct.offset), draw.Src)
+				colour.Draw(carved, carve.destination, canvas, carve.target.Min.Add(ct.offset), draw.Src)
 			}
 
 			names := make([]string, len(target))

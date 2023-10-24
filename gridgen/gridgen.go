@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"image"
-	"image/color"
 	"image/draw"
 	"math"
 	"regexp"
@@ -62,14 +61,14 @@ func baseGen(c *context.Context, geomCanvas draw.Image) (draw.Image, error) {
 		canvas = geomCanvas
 	}
 
-	background := color.NRGBA64{R: 46080, G: 46080, B: 46080, A: 0xffff}
-	colour := getFill(*c)
-	if colour != "" { // check for user defined colours
-		col := colourgen.HexToColour(colour, colourSpaceType(*c))
-		background = colourgen.ConvertNRGBA64(col)
+	background := &colour.CNRGBA64{R: 46080, G: 46080, B: 46080, A: 0xffff}
+	fillColour := getFill(*c)
+	if fillColour != "" { // check for user defined colours
+		background = colourgen.HexToColour(fillColour, colourSpaceType(*c))
+		// background = colourgen.ConvertNRGBA64(col)
 	}
 
-	draw.Draw(canvas, canvas.Bounds(), &image.Uniform{background}, image.Point{}, draw.Src)
+	colour.Draw(canvas, canvas.Bounds(), &image.Uniform{background}, image.Point{}, draw.Src)
 	// make the squares sizes
 	x := cols(*c)
 	y := rows(*c)
@@ -160,7 +159,7 @@ func gridGen(c *context.Context, geomCanvas canvasAndMask) (draw.Image, error) {
 				squares[size] = gImage
 			}
 
-			draw.Draw(canvas, image.Rect(int(x), int(y), int(x+squareX), int(y+squareY)), gImage, image.Point{}, draw.Over)
+			colour.Draw(canvas, image.Rect(int(x), int(y), int(x+squareX), int(y+squareY)), gImage, image.Point{}, draw.Over)
 			y += squareY
 		}
 		x += squareX
@@ -169,7 +168,7 @@ func gridGen(c *context.Context, geomCanvas canvasAndMask) (draw.Image, error) {
 	// if there is a global mask apply it
 	if (geomCanvas != canvasAndMask{}) {
 		base := ImageGenerator(*c, canvas.Bounds())
-		draw.DrawMask(base, base.Bounds(), geomCanvas.canvas, image.Point{}, geomCanvas.mask, image.Point{}, draw.Src)
+		colour.DrawMask(base, base.Bounds(), geomCanvas.canvas, image.Point{}, geomCanvas.mask, image.Point{}, draw.Src)
 
 		return base, nil
 	}
@@ -182,11 +181,11 @@ func maskGen(maxX, maxY int, width float64, c *context.Context) image.Image {
 	maskTailor := image.NewNRGBA64(image.Rect(0, 0, maxX, maxY))
 	// this is automaticall changed to rgb
 	cd := gg.NewContextForImage(maskTailor)
-	myBorder := color.NRGBA64{0, 0, 0, 0xffff}
+	myBorder := &colour.CNRGBA64{R: 0, G: 0, B: 0, A: 0xffff}
 	colour := canvaswidget.GetLineColour(*c)
 	if colour != "" { // check for user defined colours
-		col := colourgen.HexToColour(colour, colourSpaceType(*c))
-		myBorder = colourgen.ConvertNRGBA64(col)
+		myBorder = colourgen.HexToColour(colour, colourSpaceType(*c))
+		// myBorder = colourgen.ConvertNRGBA64(col)
 	}
 
 	cd.SetColor(myBorder)
@@ -388,7 +387,7 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 	if mask != nil {
 		mask := mask.(draw.Image)
 		maskdest := ImageGenerator(*c, image.Rect(0, 0, generatedGridInfo.w, generatedGridInfo.h))
-		draw.Draw(maskdest, maskdest.Bounds(), mask, image.Point{generatedGridInfo.X, generatedGridInfo.Y}, draw.Src)
+		colour.Draw(maskdest, maskdest.Bounds(), mask, image.Point{generatedGridInfo.X, generatedGridInfo.Y}, draw.Src)
 		generatedGridInfo.GMask = maskdest
 	}
 

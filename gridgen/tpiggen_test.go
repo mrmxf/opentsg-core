@@ -81,7 +81,7 @@ func TestTpigGeometry(t *testing.T) {
 	colours := []color.Color{color.NRGBA64{R: 0xffff, A: 0xffff}, color.NRGBA64{G: 0xffff, A: 0xffff}}
 	for x := 0; x < 30; x += 10 {
 		for y := 0; y < 30; y += 10 {
-			draw.Draw(filler, image.Rect(x, y, x+10, y+10), &image.Uniform{colours[((x+y)/10)%2]}, image.Point{}, draw.Src)
+			colour.Draw(filler, image.Rect(x, y, x+10, y+10), &image.Uniform{colours[((x+y)/10)%2]}, image.Point{}, draw.Src)
 		}
 	}
 
@@ -94,7 +94,7 @@ func TestTpigGeometry(t *testing.T) {
 
 		// Assign the colour to the correct type of image NGRBA64 and replace the colour values
 		readImage := image.NewNRGBA64(baseVals.Bounds())
-		draw.Draw(readImage, readImage.Bounds(), baseVals, image.Point{0, 0}, draw.Over)
+		colour.Draw(readImage, readImage.Bounds(), baseVals, image.Point{0, 0}, draw.Over)
 
 		hnormal := sha256.New()
 		htest := sha256.New()

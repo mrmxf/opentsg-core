@@ -11,6 +11,7 @@ import (
 	"os"
 	"regexp"
 
+	"github.com/mmTristan/opentsg-core/colour"
 	"github.com/mmTristan/opentsg-core/config/core"
 	"github.com/nfnt/resize"
 	"golang.org/x/image/tiff"
@@ -31,7 +32,7 @@ func artKeyGen(c *context.Context, geomCanvas draw.Image, base string) (draw.Ima
 	}
 
 	// add the image and then extract the locations
-	draw.Draw(canvas, canvas.Bounds(), baseImg, image.Point{}, draw.Src)
+	colour.Draw(canvas, canvas.Bounds(), baseImg, image.Point{}, draw.Src)
 	keys, err := imageToKeyMap(baseImg, c)
 	if err != nil {
 		return canvas, err
@@ -100,7 +101,7 @@ func extract(b []byte, fname string, bounds image.Point) (i *image.NRGBA64, e er
 		midI = resize.Resize(uint(bounds.X), uint(bounds.Y), midI, resize.Bicubic)
 	}
 	i = image.NewNRGBA64(midI.Bounds())
-	draw.Draw(i, i.Bounds(), midI, image.Point{}, draw.Src)
+	colour.Draw(i, i.Bounds(), midI, image.Point{}, draw.Src)
 	if e != nil {
 		e = fmt.Errorf("0042 error opening background image %v", e)
 	}
