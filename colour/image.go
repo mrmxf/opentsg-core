@@ -1,6 +1,7 @@
 package colour
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -116,11 +117,13 @@ func (n NRGB64) Set(x int, y int, c color.Color) {
 
 	// update the colour if it has an explicit colour space
 	// and the base image is using colour spaces
+	fmt.Println(c, "b")
 	if cmid, ok := c.(Color); ok && (n.space != ColorSpace{}) {
 		c = transform(cmid.GetColorSpace(), n.space, c)
 	}
-
+	fmt.Println(c, "a")
 	n.base.Set(x, y, c)
+	fmt.Println(n.base.At(x, y))
 }
 
 /*

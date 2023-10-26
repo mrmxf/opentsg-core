@@ -93,6 +93,35 @@ func TestDraw(t *testing.T) {
 		})
 	}
 
+	// check for any deviations from go
+	for i := 0; i < 5; i++ {
+
+		baseColour := color.NRGBA64{R: uint16(rand.Int63n(65535)), G: uint16(rand.Int63n(65535)), B: uint16(rand.Int63n(65535)), A: uint16(rand.Int63n(65535))}
+
+		colourImplementation := NewNRGBA64(ColorSpace{ColorSpace: "rec2020"}, image.Rect(0, 0, 1000, 1000))
+		Draw(colourImplementation, colourImplementation.Bounds(), &image.Uniform{baseColour}, image.Point{}, draw.Over)
+
+		goImplementation := NewNRGBA64(ColorSpace{ColorSpace: "rec2020"}, image.Rect(0, 0, 1000, 1000))
+		draw.Draw(goImplementation, goImplementation.Bounds(), &image.Uniform{baseColour}, image.Point{}, draw.Over)
+
+		hnormal := sha256.New()
+		htest := sha256.New()
+		hnormal.Write(goImplementation.Pix())
+		htest.Write(colourImplementation.Pix())
+		fmt.Println(colourImplementation.At(0, 0))
+		fmt.Println(goImplementation.At(0, 0))
+		//td, _ := os.Create("r.png")
+		//png.Encode(td, canvas)
+
+		Convey("Checking that the go and colour implementations of draw produce the same result, when no colour space is involved", t, func() {
+			Convey(fmt.Sprintf("Run using a colour of %v", baseColour), func() {
+				Convey("The hashes of the image are identical", func() {
+					So(htest.Sum(nil), ShouldResemble, hnormal.Sum(nil))
+				})
+			})
+		})
+	}
+
 	testColours := []CNRGBA64{{R: 35340, A: 0xffff}, {G: 30000, B: 40000, A: 0xf0f0}, {R: 0xffff, G: 0xffff, B: 0xffff}}
 
 	target := []string{"fullalpha.png", "partialalpha.png", "noalpha.png"}
@@ -131,6 +160,13 @@ func TestDraw(t *testing.T) {
 		})
 	}
 
+	base := NewNRGBA64(ColorSpace{}, image.Rect(0, 0, 2000, 1000))
+
+	fmt.Println(base.At(500, 500))
+	//base.Set(500, 500, &colour.CNRGBA64{R: 65335, A: 0xffff, Space: colour.ColorSpace{ColorSpace: "rec709"}})
+
+	Draw(base, image.Rect(400, 400, 600, 600), &image.Uniform{&CNRGBA64{R: 65335, A: 0xffff, Space: ColorSpace{ColorSpace: "rec709"}}}, image.Point{}, draw.Src)
+	fmt.Println(base.At(500, 500))
 	/*
 		f, _ := os.Create("./testdata/colour.png")
 		png.Encode(f, base)

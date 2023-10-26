@@ -1,6 +1,7 @@
 package colour
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -244,6 +245,10 @@ func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point
 					_, _, _, ma = mask.At(mx, my).RGBA()
 				}
 				switch {
+				case op == draw.Over:
+					fmt.Println("trigger", src.At(sx, sy))
+					dst.Set(x, y, src.At(sx, sy))
+
 				case ma == 0:
 					if op == draw.Over {
 						// No-op.
