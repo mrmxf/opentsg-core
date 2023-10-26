@@ -247,7 +247,9 @@ func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point
 				}
 				switch {
 				case op == draw.Over:
-
+					// this differs from the go code
+					// as it sets straight on top as does not change to rGBA64 like
+					// teh draw.Drawmask function does
 					dst.Set(x, y, src.At(sx, sy))
 
 				case ma == 0:

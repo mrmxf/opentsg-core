@@ -117,19 +117,16 @@ func (n NRGB64) Set(x int, y int, c color.Color) {
 
 	// update the colour if it has an explicit colour space
 	// and the base image is using colour spaces
-	fmt.Println(c, "b")
 	if cmid, ok := c.(Color); ok && (n.space != ColorSpace{}) {
 		fmt.Println("tra")
 		c = transform(cmid.GetColorSpace(), n.space, c)
 	}
 
-	fmt.Println(c, "C", x, y)
 	switch convert := c.(type) {
 	case color.NRGBA64:
 		n.base.SetNRGBA64(x, y, convert)
 	case *CNRGBA64:
 
-		fmt.Println(convert)
 		n.base.SetNRGBA64(x, y, color.NRGBA64{R: convert.R, G: convert.G, B: convert.B, A: convert.A})
 	default:
 		n.base.Set(x, y, convert)
