@@ -50,7 +50,7 @@ func FileImport(inputFile, profile string, debug bool, httpKeys ...string) (cont
 	}
 
 	holder := base{importedFactories: make(map[string]factory), importedWidgets: make(map[string]json.RawMessage),
-		jsonFileLines: data, authBody: authDecoder}
+		jsonFileLines: data, authBody: authDecoder, metadataParams: map[string][]string{}}
 
 	err = holder.factoryInit(inputFactory, filepath.Dir(inputFile), "", []int{})
 	if err != nil {
@@ -148,6 +148,8 @@ func (b *base) factoryInit(jsonFactory factory, path, parent string, positions [
 			return err
 			// fmt.Println(fmt.Errorf("Error opening %v:, %v\n", p, err))
 		}
+
+		b.metadataParams[parent+f.Name] = f.Args
 	}
 
 	return nil

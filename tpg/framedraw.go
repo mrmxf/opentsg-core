@@ -24,7 +24,7 @@ import (
 	geometrytext "github.com/mmTristan/opentsg-widgets/geometryText"
 	"github.com/mmTristan/opentsg-widgets/noise"
 	"github.com/mmTristan/opentsg-widgets/qrgen"
-	"github.com/mmTristan/opentsg-widgets/stripes"
+	"github.com/mmTristan/opentsg-widgets/ramps"
 	"github.com/mmTristan/opentsg-widgets/textbox"
 	"github.com/mmTristan/opentsg-widgets/zoneplate"
 	"gopkg.in/yaml.v3"
@@ -215,7 +215,7 @@ func (tpg *opentsg) Draw(debug bool, mnt, logType string) {
 
 func baseWidgets() []func(chan draw.Image, bool, *context.Context, *sync.WaitGroup, *sync.WaitGroup, *errhandle.Logger) {
 	return []func(chan draw.Image, bool, *context.Context, *sync.WaitGroup, *sync.WaitGroup, *errhandle.Logger){
-		stripes.RampGen, zoneplate.ZoneGen, noise.NGenerator, widgethandler.MockCanvasGen,
+		ramps.RampGenerate, zoneplate.ZoneGen, noise.NGenerator, widgethandler.MockCanvasGen,
 		addimage.ImageGen, textbox.TBGenerate, bars.BarGen, saturation.SatGen,
 		framecount.CountGen, qrgen.QrGen, twosi.SIGenerate, nearblack.NBGenerate,
 		luma.Generate, fourcolour.FourColourGenerator, geometrytext.LabelGenerator,

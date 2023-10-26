@@ -62,6 +62,8 @@ func (f factory) getArgs() []string {
 type factoryarr struct {
 	URI  string `json:"uri,omitempty" yaml:"uri,omitempty"`
 	Name string `json:"name,omitempty" yaml:"name,omitempty"`
+
+	Args []string `json:"args" yaml:"args"`
 }
 
 type generate struct {
@@ -80,6 +82,8 @@ type base struct {
 	importedFactories     map[string]factory
 	importedWidgets       map[string]json.RawMessage
 	generatedFrameWidgets map[string]widgetContents
+	metadataParams        map[string][]string
+	metadataBucket        map[string]map[string]any
 }
 
 // widgetContents is the content of each widget within a frame and its position in the run order

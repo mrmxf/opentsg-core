@@ -40,7 +40,9 @@ func FrameWidgetsGenerator(c context.Context, pos int, debug bool) (context.Cont
 	// create a clean map for each frame to prevent overwrite errors. Line holder is only to be read from
 	bases := base{importedFactories: make(map[string]factory),
 		importedWidgets: make(map[string]json.RawMessage),
-		jsonFileLines:   mainBase.jsonFileLines}
+		jsonFileLines:   mainBase.jsonFileLines,
+		metadataParams:  mainBase.metadataParams,
+		metadataBucket:  make(map[string]map[string]any)}
 	for k, v := range mainBase.importedFactories {
 		bases.importedFactories[k] = v
 	}
@@ -163,8 +165,39 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 			}
 
 		} else { // run the factory
+
 			args := childFactory.getArgs()
 			metadata := make(map[string]any)
+			metadata2 := make(map[string]any)
+
+			parents := strings.Split(parent, ".")
+			parents = parents[:len(parents)-1]
+			var base string
+			var args2 []string
+
+			for i, p := range parents {
+				//fmt.Println(p)
+				if i != 0 {
+					base += "." + p
+				} else {
+					base = p
+				}
+
+				args2 = append(args2, b.metadataParams[base]...)
+
+				mapOverWriter(metadata2, b.metadataBucket[base])
+				// fmt.Println(b.metadataBucket[base], metadata2, base, "metadata")
+			}
+
+			args2 = append(args2, b.metadataParams[parent+runKey]...)
+			// switch between the methods
+			if len(args2) > len(args) {
+				args = args2
+			}
+
+			// metadata bucket can be run here
+			// can give parents and overwriting here
+
 			additions := make(map[string]any)
 			// newChild is the generated creates to passed along
 
@@ -178,6 +211,18 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 				}
 			}
 
+			mapOverWriter(metadata2, metadata)
+			metadata = metadata2
+			// assign the metadata after it is generated
+			fullname := parent + runKey
+
+			if dotExt != "" {
+
+				fullname += "." + dotExt
+			}
+			b.metadataBucket[fullname] = metadata
+			fmt.Println(b.metadataBucket, runKey, parents, dotExt, "md", dotPath)
+
 			newChild, err := getChildren(childFactory, dotPath, dotExt, additions, metadata)
 			if err != nil { // quit this run after finding the errors
 				genErrs = append(genErrs, err)
@@ -185,10 +230,13 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 				continue
 			}
 
+			fmt.Println(newChild)
+
 			// run the generate first if there is any
 			// do not run if the dot path is targeting its children
 			// as the children are updated afterwards
 			if len(childFactory.Generate) > 0 && dotExt == "" {
+				fmt.Println(b.metadataBucket)
 				errs := b.factoryGenerateWidgets(childFactory.Generate, dotPath+".", metadata, append(positions, creatCount), zPos)
 				genErrs = append(genErrs, errs...)
 			}
@@ -205,6 +253,13 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 	}
 
 	return genErrs, arrayUpdates
+}
+
+func mapOverWriter[C comparable, T any](dest, new map[C]T) {
+
+	for k, v := range new {
+		dest[k] = v
+	}
 }
 
 // getChildren extracts the children of a factory. If it contains a dotpath extension then the child is just the single
