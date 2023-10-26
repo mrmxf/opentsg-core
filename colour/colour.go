@@ -1,7 +1,6 @@
 package colour
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -236,7 +235,9 @@ func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point
 		var out CNRGBA64
 		sy := sp.Y + y0 - r.Min.Y
 		my := mp.Y + y0 - r.Min.Y
+		c := 0
 		for y := y0; y != y1; y, sy, my = y+dy, sy+dy, my+dy {
+			c++
 			sx := sp.X + x0 - r.Min.X
 			mx := mp.X + x0 - r.Min.X
 			for x := x0; x != x1; x, sx, mx = x+dx, sx+dx, mx+dx {
@@ -246,7 +247,7 @@ func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point
 				}
 				switch {
 				case op == draw.Over:
-					fmt.Println("trigger", src.At(sx, sy))
+
 					dst.Set(x, y, src.At(sx, sy))
 
 				case ma == 0:
@@ -289,6 +290,7 @@ func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point
 					// declared outside of the inner loop) to avoid the implicit
 					// conversion to color.Color here allocating memory in the
 					// inner loop if sizeof(color.RGBA64) > sizeof(uintptr).
+
 					dst.Set(x, y, &out)
 				}
 			}
