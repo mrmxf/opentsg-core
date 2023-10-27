@@ -221,7 +221,7 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 				fullname += "." + dotExt
 			}
 			b.metadataBucket[fullname] = metadata
-			fmt.Println(b.metadataBucket, runKey, parents, dotExt, "md", dotPath)
+			// fmt.Println(b.metadataBucket, runKey, parents, dotExt, "md", dotPath)
 
 			newChild, err := getChildren(childFactory, dotPath, dotExt, additions, metadata)
 			if err != nil { // quit this run after finding the errors
@@ -230,13 +230,13 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 				continue
 			}
 
-			fmt.Println(newChild)
+			// fmt.Println(newChild)
 
 			// run the generate first if there is any
 			// do not run if the dot path is targeting its children
 			// as the children are updated afterwards
 			if len(childFactory.Generate) > 0 && dotExt == "" {
-				fmt.Println(b.metadataBucket)
+				//	fmt.Println(b.metadataBucket)
 				errs := b.factoryGenerateWidgets(childFactory.Generate, dotPath+".", metadata, append(positions, creatCount), zPos)
 				genErrs = append(genErrs, errs...)
 			}

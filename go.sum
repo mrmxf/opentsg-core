@@ -184,6 +184,8 @@ github.com/mmTristan/opentsg-widgets v0.0.0-20231027081127-a586b7af1e1e h1:mP6rI
 github.com/mmTristan/opentsg-widgets v0.0.0-20231027081127-a586b7af1e1e/go.mod h1:eorRWSnBSvkap1kPaqptEhY558+MW5667AREnTnjdOg=
 github.com/mmTristan/opentsg-widgets v0.0.0-20231027083921-eb19aee6823b h1:OrCC0aRPCVrNiGO8IGAOK6yQvbVQA6+ty7RMQSy1hp0=
 github.com/mmTristan/opentsg-widgets v0.0.0-20231027083921-eb19aee6823b/go.mod h1:eorRWSnBSvkap1kPaqptEhY558+MW5667AREnTnjdOg=
+github.com/mmTristan/opentsg-widgets v0.0.0-20231027091055-61ee5918496c h1:1rdjmOmDKfJU8XevFUP+k9jkBZS89IPuR77QDBi1dec=
+github.com/mmTristan/opentsg-widgets v0.0.0-20231027091055-61ee5918496c/go.mod h1:eorRWSnBSvkap1kPaqptEhY558+MW5667AREnTnjdOg=
 github.com/mrmxf/opentsg-core v0.0.0-20230830153622-6d3831e3c1ed h1:N+0FXV0ULEhMdNcLHo9813sielgix024NpQpNF2jYNA=
 github.com/mrmxf/opentsg-core v0.0.0-20230830153622-6d3831e3c1ed/go.mod h1:CG5ZMRC8WLHnChyXKRqHjNBvFzySB5WMiWoLsE/hdXg=
 github.com/mrmxf/opentsg-io v0.0.0-20230830164134-91af35b9a721 h1:ath3hVN56KBjq3WkJf9vEo+3FsO5a9NotmsoPdDx+5A=
