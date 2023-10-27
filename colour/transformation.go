@@ -1,7 +1,6 @@
 package colour
 
 import (
-	"fmt"
 	"image/color"
 	"math"
 )
@@ -47,7 +46,7 @@ type lut interface {
 
 func transform(input, output ColorSpace, cols color.Color) color.Color {
 
-	fmt.Println(input, output)
+	//fmt.Println(input, output)
 	// fmt.Println(input, output)
 	// if the colour spaces match or one isn't declared
 	if input.ColorSpace == output.ColorSpace || (input == ColorSpace{}) || (output == ColorSpace{}) {
