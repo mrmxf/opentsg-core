@@ -9,7 +9,7 @@ require (
 	github.com/cespare/xxhash v1.1.0
 	github.com/fogleman/gg v1.3.0
 	github.com/matoous/go-nanoid v1.5.0
-	github.com/mmTristan/opentsg-widgets v0.0.0-20231025133339-ea7d77c67bbb
+	github.com/mmTristan/opentsg-widgets v0.0.0-20231027081127-a586b7af1e1e
 	github.com/mrmxf/opentsg-io v0.0.0-20230830164134-91af35b9a721
 	github.com/mrmxf/opentsg-mhl v0.0.0-20230713210602-b4af671ab2ac
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
