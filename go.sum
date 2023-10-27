@@ -182,6 +182,8 @@ github.com/matoous/go-nanoid v1.5.0 h1:VRorl6uCngneC4oUQqOYtO3S0H5QKFtKuKycFG3eu
 github.com/matoous/go-nanoid v1.5.0/go.mod h1:zyD2a71IubI24efhpvkJz+ZwfwagzgSO6UNiFsZKN7U=
 github.com/mmTristan/opentsg-widgets v0.0.0-20231027081127-a586b7af1e1e h1:mP6rIm+t0X9Qq4vOxajJme1wOR4Q/wZucY1qsKkhyQY=
 github.com/mmTristan/opentsg-widgets v0.0.0-20231027081127-a586b7af1e1e/go.mod h1:eorRWSnBSvkap1kPaqptEhY558+MW5667AREnTnjdOg=
+github.com/mmTristan/opentsg-widgets v0.0.0-20231027083921-eb19aee6823b h1:OrCC0aRPCVrNiGO8IGAOK6yQvbVQA6+ty7RMQSy1hp0=
+github.com/mmTristan/opentsg-widgets v0.0.0-20231027083921-eb19aee6823b/go.mod h1:eorRWSnBSvkap1kPaqptEhY558+MW5667AREnTnjdOg=
 github.com/mrmxf/opentsg-core v0.0.0-20230830153622-6d3831e3c1ed h1:N+0FXV0ULEhMdNcLHo9813sielgix024NpQpNF2jYNA=
 github.com/mrmxf/opentsg-core v0.0.0-20230830153622-6d3831e3c1ed/go.mod h1:CG5ZMRC8WLHnChyXKRqHjNBvFzySB5WMiWoLsE/hdXg=
 github.com/mrmxf/opentsg-io v0.0.0-20230830164134-91af35b9a721 h1:ath3hVN56KBjq3WkJf9vEo+3FsO5a9NotmsoPdDx+5A=
