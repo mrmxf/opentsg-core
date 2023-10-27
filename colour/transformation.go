@@ -50,7 +50,7 @@ func transform(input, output ColorSpace, cols color.Color) color.Color {
 	fmt.Println(input, output)
 	// fmt.Println(input, output)
 	// if the colour spaces match or one isn't declared
-	if input.ColorSpace == output.ColorSpace || (input == ColorSpace{}) {
+	if input.ColorSpace == output.ColorSpace || (input == ColorSpace{}) || (output == ColorSpace{}) {
 		return cols
 	}
 

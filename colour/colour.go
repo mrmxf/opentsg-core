@@ -1,7 +1,6 @@
 package colour
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -268,10 +267,10 @@ func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point
 
 					// sr, sg, sb, sa := src.At(sx, sy).RGBA()
 					if cspace, ok := src.At(sx, sy).(*CNRGBA64); ok {
-						fmt.Println(src.At(sx, sy))
+
 						// transform the colour before applying it
 						tCol := transform(cspace.Space, dst.(*NRGB64).space, src.At(sx, sy))
-						fmt.Println(tCol, "out")
+
 						// making sure to cut out alpha multiplied values
 						//	atc := tCol.(*CNRGBA64)
 						//	sr, sg, sb, sa = uint32(atc.R), uint32(atc.G), uint32(atc.B), uint32(atc.A)
