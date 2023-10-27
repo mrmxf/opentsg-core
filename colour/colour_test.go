@@ -93,23 +93,22 @@ func TestDraw(t *testing.T) {
 			})
 		})
 	}
-
+	colourImplementation := NewNRGBA64(ColorSpace{}, image.Rect(0, 0, 20, 20))
+	goImplementation := NewNRGBA64(ColorSpace{}, image.Rect(0, 0, 20, 20))
 	// check for any deviations from go
 	for i := 0; i < 5; i++ {
 
-		baseColour := color.NRGBA64{R: uint16(rand.Int63n(65535)), G: uint16(rand.Int63n(65535)), B: uint16(rand.Int63n(65535)), A: uint16(rand.Int63n(65535))}
+		baseColour := CNRGBA64{R: uint16(rand.Int63n(65535)), G: uint16(rand.Int63n(65535)), B: uint16(rand.Int63n(65535)), A: uint16(rand.Int63n(65535))}
 
-		colourImplementation := NewNRGBA64(ColorSpace{ColorSpace: "rec2020"}, image.Rect(0, 0, 20, 20))
-		Draw(colourImplementation, colourImplementation.Bounds(), &image.Uniform{baseColour}, image.Point{}, draw.Over)
+		Draw(colourImplementation, colourImplementation.Bounds(), &image.Uniform{&baseColour}, image.Point{}, draw.Over)
 
-		goImplementation := NewNRGBA64(ColorSpace{ColorSpace: "rec2020"}, image.Rect(0, 0, 20, 20))
-		draw.Draw(goImplementation, goImplementation.Bounds(), &image.Uniform{baseColour}, image.Point{}, draw.Over)
+		draw.Draw(goImplementation, goImplementation.Bounds(), &image.Uniform{&baseColour}, image.Point{}, draw.Over)
 
 		hnormal := sha256.New()
 		htest := sha256.New()
 		hnormal.Write(goImplementation.Pix())
 		htest.Write(colourImplementation.Pix())
-		fmt.Println(colourImplementation.At(0, 0))
+		fmt.Println(colourImplementation.At(0, 0), "my version")
 		fmt.Println(goImplementation.At(0, 0))
 		//td, _ := os.Create("r.png")
 		//png.Encode(td, canvas)
@@ -117,7 +116,7 @@ func TestDraw(t *testing.T) {
 		Convey("Checking that the go and colour implementations of draw produce the same result, when no colour space is involved", t, func() {
 			Convey(fmt.Sprintf("Run using a colour of %v", baseColour), func() {
 				Convey("The hashes of the image are identical", func() {
-					So(htest.Sum(nil), ShouldResemble, hnormal.Sum(nil))
+					So(colourImplementation.At(0, 0), ShouldResemble, &baseColour)
 				})
 			})
 		})
