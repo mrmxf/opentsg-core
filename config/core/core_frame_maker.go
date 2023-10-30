@@ -138,7 +138,8 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 
 	// extract the runOrder to use the keys in
 	runOrder := keyOrder(createTargets)
-
+	fmt.Println("W", runOrder)
+	fmt.Println(b.importedFactories, "imported")
 	creatCount := start
 	// run the updates in the set order
 	for _, runKey := range runOrder {
@@ -174,6 +175,9 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 			parents = parents[:len(parents)-1]
 			var base string
 			var args2 []string
+
+			fmt.Println("IAM RUN")
+			fmt.Println(b.metadataParams, "PARENT", parent, runKey)
 
 			for i, p := range parents {
 				//fmt.Println(p)

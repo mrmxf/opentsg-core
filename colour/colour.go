@@ -217,6 +217,18 @@ func Draw(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point, op
 
 // DrawMask aligns r.Min in dst with sp in src and mp in mask and then replaces the rectangle r
 // in dst with the result of a Porter-Duff composition. A nil mask is treated as opaque.
+/*
+This version has been made to include the transform options for when colour space aware colours
+are used. This works by using the transform function before placing the colour on the destination
+image
+
+Further more this uses NRGBA64 as a base to set colours, rather than the RGBA64 model
+favoured by go. This means that the non alpha multiplied RGB values are used unless
+required when alpha is neither 0 or maxAlpha
+
+This function is only recommended when using NRGB64 images that are colour space aware and
+you drawing with the same images.
+*/
 func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point, mask image.Image, mp image.Point, op draw.Op) {
 
 	switch dst.(type) {
@@ -262,61 +274,115 @@ func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point
 				case ma == maxAlpha && op == draw.Src:
 					dst.Set(x, y, src.At(sx, sy))
 				default:
-					//	atc := color.NRGBA64Model.Convert(src.At(sx, sy)).(color.NRGBA64)
-					sr, sg, sb, sa := src.At(sx, sy).RGBA()
 
-					// sr, sg, sb, sa := src.At(sx, sy).RGBA()
-					if cspace, ok := src.At(sx, sy).(*CNRGBA64); ok {
+					/*
+
+
+						we know the base is NRGBA64
+
+
+					*/
+					//	atc := color.NRGBA64Model.Convert(src.At(sx, sy)).(color.NRGBA64)
+					srCol := src.At(sx, sy)
+					var sr, sg, sb, sa uint32
+					// this works in nrgb64, so we treat every colour as NRGB64
+					if ncol, ok := srCol.(color.NRGBA64); ok {
+						sr, sg, sb, sa = uint32(ncol.R), uint32(ncol.G), uint32(ncol.B), uint32(ncol.A)
+					} else if cspace, ok := src.At(sx, sy).(*CNRGBA64); ok {
 
 						// transform the colour before applying it
 						tCol := transform(cspace.Space, dst.(*NRGB64).space, src.At(sx, sy))
-
+						ncol := tCol.(*CNRGBA64)
 						// making sure to cut out alpha multiplied values
 						//	atc := tCol.(*CNRGBA64)
 						//	sr, sg, sb, sa = uint32(atc.R), uint32(atc.G), uint32(atc.B), uint32(atc.A)
-						sr, sg, sb, sa = tCol.RGBA()
+						sr, sg, sb, sa = uint32(ncol.R), uint32(ncol.G), uint32(ncol.B), uint32(ncol.A)
+						// sr, sg, sb, sa = tCol.RGBA()
+					} else {
+						// convert these into non alpha multiplied values
+						// this will be lossy so stick to NRGBA64 or CNRGBA64
+						// if you want accurate values
+						// @TODO figure out how to stop RGBA 64 causing overflow issues
+						//	sr, sg, sb, sa = srCol.RGBA()
+
+						nrgbCol := color.NRGBA64Model.Convert(srCol).(color.NRGBA64)
+
+						sr, sg, sb, sa = uint32(nrgbCol.R), uint32(nrgbCol.G), uint32(nrgbCol.B), uint32(nrgbCol.A)
 					}
 					// NRGBA64 is non alpha multiplied
-					if op == draw.Over {
-						var tempout color.RGBA64
-						dr, dg, db, da := dst.At(x, y).RGBA()
-						a := maxAlpha - (sa * ma / maxAlpha)
-						tempout.R = uint16((dr*a + sr*ma) / maxAlpha)
-						tempout.G = uint16((dg*a + sg*ma) / maxAlpha)
-						tempout.B = uint16((db*a + sb*ma) / maxAlpha)
-						tempout.A = uint16((da*a + sa*ma) / maxAlpha)
-
-						midOut := color.NRGBA64Model.Convert(tempout).(color.NRGBA64)
-						out.R, out.G, out.B, out.A = midOut.R, midOut.G, midOut.B, midOut.A
-
-						/*
+					/*
+						if op == draw.Over {
+							var tempout color.RGBA64
 							dr, dg, db, da := dst.At(x, y).RGBA()
-							fmt.Println(dst.At(x, y))
-							fmt.Println(src.At(x, y))
-							fmt.Println(ma, sa, da)
-							a := (maxAlpha * da) / (sa + da)
-							ma := (maxAlpha * sa) / (sa + da)
-							fmt.Println(a, ma, "aa")
-							fmt.Println(src.At(sx, sy).RGBA())
-							//a := maxAlpha - (sa * ma / maxAlpha)
+							a := maxAlpha - (sa * ma / maxAlpha)
+							tempout.R = uint16((dr*a + sr*ma) / maxAlpha)
+							tempout.G = uint16((dg*a + sg*ma) / maxAlpha)
+							tempout.B = uint16((db*a + sb*ma) / maxAlpha)
+							tempout.A = uint16((da*a + sa*ma) / maxAlpha)
 
-							out.A = uint16((da*a + sa*ma) / (maxAlpha))
-							out.R = uint16((dr*a + sr*ma) / maxAlpha)
-							out.G = uint16((dg*a + sg*ma) / maxAlpha)
-							fmt.Println((db*a + sb*ma) / maxAlpha)
-							fmt.Println((db*a + sb*ma), db, sb)
-							out.B = uint16((db*a + sb*ma) / maxAlpha)
+							midOut := color.NRGBA64Model.Convert(tempout).(color.NRGBA64)
+							out.R, out.G, out.B, out.A = midOut.R, midOut.G, midOut.B, midOut.A
 
-							fmt.Println(out, "out")
-							fmt.Println(color.NRGBA64Model.Convert(color.RGBA64{R: out.R, G: out.G, B: out.B, A: out.A}))*/
 
-					} else {
+						} else {
+							out.R = uint16(sr * ma / maxAlpha)
+							out.G = uint16(sg * ma / maxAlpha)
+							out.B = uint16(sb * ma / maxAlpha)
+							out.A = uint16(sa * ma / maxAlpha)
+						}*/
+
+					if op == draw.Src || sa == maxAlpha {
 						out.R = uint16(sr * ma / maxAlpha)
 						out.G = uint16(sg * ma / maxAlpha)
 						out.B = uint16(sb * ma / maxAlpha)
 						out.A = uint16(sa * ma / maxAlpha)
+
+					} else {
+						dstCol := dst.At(x, y).(*CNRGBA64)
+						dr, dg, db, da := uint32(dstCol.R), uint32(dstCol.G), uint32(dstCol.B), uint32(dstCol.A)
+
+						if da == 0 {
+							out = CNRGBA64{R: uint16(sr), G: uint16(sg), B: uint16(sb), A: uint16(sa)}
+						} else {
+
+							// else get the alpha multiplied version of the dst and src RGBA values
+							sr, sg, sb = ((sr * sa) / maxAlpha), ((sg * sa) / maxAlpha), ((sb * sa) / maxAlpha)
+							dr, dg, db = ((dr * da) / maxAlpha), ((dg * da) / maxAlpha), ((db * da) / maxAlpha)
+
+							// the alpha weighting can be changed
+							// to a function for when different
+							// clour spaces are usef
+							a := maxAlpha - (sa * ma / maxAlpha)
+
+							out.A = uint16((da*a + sa*ma) / maxAlpha)
+							// divide by alpha to get th eno alpha multiplied version
+							out.R = uint16((dr*a + sr*ma) / uint32(out.A))
+							out.G = uint16((dg*a + sg*ma) / uint32(out.A))
+							out.B = uint16((db*a + sb*ma) / uint32(out.A))
+
+							// out.G = uint16((dg*da + sg*sa) / (da + sa))
+							// out.B = uint16((db*da + sb*sa) / (da + sa))
+							// out.A = uint16((da*a + sa*ma) / maxAlpha)
+
+							//midOut := color.NRGBA64Model.Convert(tempout).(color.NRGBA64)
+							//out.R, out.G, out.B, out.A = midOut.R, midOut.G, midOut.B, midOut.A
+
+							/*
+								var tempout color.RGBA64
+								dr, dg, db, da := dst.At(x, y).RGBA()
+								a := maxAlpha - (sa * ma / maxAlpha)
+								tempout.R = uint16((dr*a + sr*ma) / maxAlpha)
+								tempout.G = uint16((dg*a + sg*ma) / maxAlpha)
+								tempout.B = uint16((db*a + sb*ma) / maxAlpha)
+								tempout.A = uint16((da*a + sa*ma) / maxAlpha)
+
+								midOut := color.NRGBA64Model.Convert(tempout).(color.NRGBA64)
+								out.R, out.G, out.B, out.A = midOut.R, midOut.G, midOut.B, midOut.A*/
+						}
 					}
 
+					// @TODO double check if this is needed
+					// or double dipping transformations
 					// assign the colour space if there is one
 					if cspace, ok := src.At(sx, sy).(*CNRGBA64); ok {
 						out.Space = cspace.Space

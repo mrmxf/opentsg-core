@@ -7,7 +7,7 @@
         "`swatchType` property is set by parent"
     ],
     "include": [
-        {"uri":"canvas.json", "name":"canvas"},
+        {"uri":"canvas.json", "name":"canvas",  "args":["swatchType2"]},
         {"uri":"swatch.json", "name":"swatch"}
     ],
     "create":[

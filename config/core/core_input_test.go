@@ -141,7 +141,8 @@ func TestYamlRead(t *testing.T) {
 	*/
 
 	newDesign := "./testdata/frame_generate2/sequence.json"
-	cYaml, _, _ := FileImport(newDesign, "", false)
+	cYaml, _, e := FileImport(newDesign, "", false)
+	fmt.Println(e, "input error")
 	predictedValues := []string{"./testdata/frame_generate/results/blue.yaml", "./testdata/frame_generate/results/green.yaml"}
 
 	for i, pv := range predictedValues {
@@ -161,7 +162,7 @@ func TestYamlRead(t *testing.T) {
 		}
 
 		fmt.Printf("\n\n\n")
-		fmt.Println(frameJSON)
+		fmt.Println(frameJSON, "end")
 
 		Convey("Checking arguments are parsed correctly both in the create and generate section of json factories with the new method", t, func() {
 			Convey(fmt.Sprintf("Using frame %v ./testdata/sequnce.json as the input ", i), func() {

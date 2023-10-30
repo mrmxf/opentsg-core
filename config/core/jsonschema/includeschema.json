@@ -19,6 +19,8 @@
                         "type": "string",
                         "pattern": "^[\\w\\W]{1,255}$",
                         "description": "the unquie identifier that should be assigned to the factory object"
+                    }, "args" : {
+                        "type":"array"
                     }
                 },
                 "required": [

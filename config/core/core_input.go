@@ -124,8 +124,9 @@ func (b *base) factoryInit(jsonFactory factory, path, parent string, positions [
 
 			var validatorError error
 			if err := validator.SchemaValidator(incschema, fileBytes, parent, factLines); err != nil {
-				b.importedWidgets[parent+f.Name] = fileBytes
+				// @TODO include a better error handling method
 
+				b.importedWidgets[parent+f.Name] = fileBytes
 				validatorError = validator.Liner(fileBytes, inputPath, "widget", b.jsonFileLines)
 			} else {
 				// schema check here?

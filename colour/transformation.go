@@ -133,7 +133,7 @@ func matrixTransform(xyz, rgb [3][3]float64) func(color.Color) color.Color {
 			}
 		}
 		// preserve the alpha channel
-		return color.NRGBA64{R: uint16(aR), G: uint16(aG), B: uint16(aB), A: uint16(A)}
+		return &CNRGBA64{R: uint16(aR), G: uint16(aG), B: uint16(aB), A: uint16(A)}
 
 	}
 }
