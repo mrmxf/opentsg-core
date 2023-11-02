@@ -34,14 +34,14 @@ var ( /*
 	red75    = &CNRGBA64{R: 721 << 6, G: 64 << 6, B: 64 << 6, A: 0xffff}
 	blue75   = &CNRGBA64{R: 64 << 6, G: 64 << 6, B: 721 << 6, A: 0xffff}
 
-	gray40YCbCr   = &CYCbCr{Y: 104, Cb: 128, Cr: 128}
-	white75YCbCr  = &CYCbCr{Y: 180, Cb: 128, Cr: 128}
-	yellow75YCbCr = &CYCbCr{Y: 168, Cb: 44, Cr: 136}
-	cyan75YCbCr   = &CYCbCr{Y: 145, Cb: 147, Cr: 44}
-	green75YCbCr  = &CYCbCr{Y: 133, Cb: 63, Cr: 52}
-	mag75YCbCr    = &CYCbCr{Y: 63, Cb: 193, Cr: 204}
-	red75YCbCr    = &CYCbCr{Y: 51, Cb: 109, Cr: 212}
-	blue75YCbCr   = &CYCbCr{Y: 28, Cb: 212, Cr: 120}
+	gray40YCbCr   = &CyCbCr{Y: 104, Cb: 128, Cr: 128}
+	white75YCbCr  = &CyCbCr{Y: 180, Cb: 128, Cr: 128}
+	yellow75YCbCr = &CyCbCr{Y: 168, Cb: 44, Cr: 136}
+	cyan75YCbCr   = &CyCbCr{Y: 145, Cb: 147, Cr: 44}
+	green75YCbCr  = &CyCbCr{Y: 133, Cb: 63, Cr: 52}
+	mag75YCbCr    = &CyCbCr{Y: 63, Cb: 193, Cr: 204}
+	red75YCbCr    = &CyCbCr{Y: 51, Cb: 109, Cr: 212}
+	blue75YCbCr   = &CyCbCr{Y: 28, Cb: 212, Cr: 120}
 )
 
 const (
@@ -122,7 +122,7 @@ func (br bar) generateYCbCr(canvas Image) {
 		//	fmt.Println(Y, cb, cr)
 		//	fmt.Println(fill.RGBA())
 
-		fill := &CYCbCr{Y: Y, Cb: cb, Cr: cr, Space: br.Space}
+		fill := &CyCbCr{Y: Y, Cb: cb, Cr: cr, Space: br.Space}
 
 		// canvas.Draw(area, f.color, draw.Src, br.Space)
 		Draw(canvas, area, &image.Uniform{fill}, image.Point{}, draw.Src)

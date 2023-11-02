@@ -88,7 +88,7 @@ func HexToColour(colorCode string, space colour.ColorSpace) *colour.CNRGBA64 {
 		base = &colour.CNRGBA64{}
 	}
 
-	base.Space = space
+	base.ColorSpace = space
 	return base
 }
 

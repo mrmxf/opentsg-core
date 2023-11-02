@@ -212,7 +212,7 @@ func WriteTiffFile(f *os.File, img draw.Image, empty int) error {
 	case *image.NRGBA64:
 
 		return tiffup.Encode(f, canvas)
-	case *colour.NRGB64:
+	case *colour.NRGBA64:
 		return colour.TiffEncode(f, canvas.BaseImage(), nil)
 
 	default:
@@ -243,7 +243,7 @@ func WriteDPXFile(f *os.File, toDraw draw.Image, bit int) error {
 	switch canvas := toDraw.(type) {
 	case *image.NRGBA64:
 		return dpx.Encode(f, canvas, &dpx.Options{Bitdepth: bit})
-	case *colour.NRGB64:
+	case *colour.NRGBA64:
 		return dpx.Encode(f, canvas.BaseImage(), &dpx.Options{Bitdepth: bit})
 	default:
 		return fmt.Errorf("configuration error image of type %v can not be saved as a dpx", reflect.TypeOf(toDraw))
@@ -258,7 +258,7 @@ func WriteCSVFile(file *os.File, toDraw draw.Image, empty int) error {
 	switch canvas := toDraw.(type) {
 	case *image.NRGBA64:
 		return csvsave.Encode(filename, canvas)
-	case *colour.NRGB64:
+	case *colour.NRGBA64:
 		return csvsave.Encode(filename, canvas.BaseImage())
 	default:
 		return fmt.Errorf("configuration error image of type %v can not be saved as a csv", reflect.TypeOf(toDraw))

@@ -116,7 +116,7 @@ func TestWidgetRun(t *testing.T) {
 	hnormal := sha256.New()
 	htest := sha256.New()
 	hnormal.Write(readImage.Pix)
-	htest.Write(canvas.(*colour.NRGB64).Pix())
+	htest.Write(canvas.(*colour.NRGBA64).Pix())
 
 	// td, _ := os.Create("r.png")
 	// png.Encode(td, canvas)
@@ -175,7 +175,7 @@ func TestZposRun(t *testing.T) {
 		hnormal := sha256.New()
 		htest := sha256.New()
 		hnormal.Write(readImage.Pix)
-		htest.Write(canvas.(*colour.NRGB64).Pix())
+		htest.Write(canvas.(*colour.NRGBA64).Pix())
 
 		// td, _ := os.Create(ftarget + "r.png")
 		// png.Encode(td, canvas)
@@ -239,7 +239,7 @@ func TestErrorZpos(t *testing.T) {
 		hnormal := sha256.New()
 		htest := sha256.New()
 		hnormal.Write(readImage.Pix)
-		htest.Write(canvas.(*colour.NRGB64).Pix())
+		htest.Write(canvas.(*colour.NRGBA64).Pix())
 
 		// td, _ := os.Create(fmt.Sprintf("%vr.png", ftarget))
 		// png.Encode(td, canvas)
@@ -265,7 +265,7 @@ type test struct {
 func (tt test) Generate(i draw.Image, t ...any) error {
 	c := colourgen.HexToColour(tt.Colour, colour.ColorSpace{})
 	// fmt.Println(tt.Fill)
-	colour.Draw(i.(*colour.NRGB64), i.Bounds(), &image.Uniform{c}, image.Point{}, draw.Src)
+	colour.Draw(i.(*colour.NRGBA64), i.Bounds(), &image.Uniform{c}, image.Point{}, draw.Src)
 
 	return nil
 }

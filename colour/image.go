@@ -11,17 +11,19 @@ import (
 )
 
 /*
-ColorSpace will need some methods as transforms get more complicated
+ColorSpace contains all the information of a colours colourspace.
 */
 type ColorSpace struct {
+	// Short form to be used for common colour spaces e.g. "rec709"
 	ColorSpace string `json:"ColorSpace,omitempty" yaml:"ColorSpace,omitempty"`
-	// Primaries let the space be declared as a string and the primaries
-	// be sued for generating transformation matrices.
-	// Have two seperate maps for data points
-	TransformType string    `json:"TransformType,omitempty" yaml:"TransformType,omitempty"`
-	Primaries     Primaries `json:"Primaries,omitempty" yaml:"Primaries,omitempty"`
+	// Preffered transformtype. Not currently in use
+	TransformType string `json:"TransformType,omitempty" yaml:"TransformType,omitempty"`
+	// for custom colourspaces, the primaries can be declared in XY space
+	Primaries Primaries `json:"Primaries,omitempty" yaml:"Primaries,omitempty"`
 }
 
+// The Primaries of a colour space consist of the XY coordinates
+// of the RGB and whitepoint
 type Primaries struct {
 	Red        XY `json:"Red,omitempty" yaml:"Red,omitempty"`
 	Green      XY `json:"Green,omitempty" yaml:"Green,omitempty"`
@@ -29,67 +31,48 @@ type Primaries struct {
 	WhitePoint XY `json:"WhitePoint,omitempty" yaml:"WhitePoint,omitempty"`
 }
 
+// XY is the XY spae of the CIE colour chart
 type XY struct {
 	X int `json:"X,omitempty" yaml:"X,omitempty"`
 	Y int `json:"Y,omitempty" yaml:"Y,omitempty"`
 }
 
+// Image is used for colour space aware images.
 type Image interface {
 	Space() ColorSpace
 	draw.Image // Draw include Set
 }
 
-// font needs draw.Image
-// include the framework to do it properly
-// and hope people just do it?
-/*
-the colour should awlays be transformed before Set()
-e.g. by running canvas.Transform()
-
-You do not want to double transform.
-
-What uses set.
-
-These are special cases can we doing something tight for them
-Add image
-any textbox
-
-*/
-
-type NRGB64 struct {
+// NRGBA64 is a wrapped *image.NRGBA64 with a colorspace
+type NRGBA64 struct {
 	base  *image.NRGBA64
 	space ColorSpace
 }
 
-/*
-wrap all the image functions with NRGB642
-
-
-My current idea is using interface for NRGBa for our own colour tyoe that applies the transformation ar each set
-replacing the interface with one that returns the colour space for prosperity
-*/
-
-func NewNRGBA64(s ColorSpace, r image.Rectangle) *NRGB64 {
+// Generate a new NRGBA64 imagethat is wrapped with a colour space
+func NewNRGBA64(s ColorSpace, r image.Rectangle) *NRGBA64 {
 
 	base := image.NewNRGBA64(r)
 
-	return &NRGB64{base: base, space: s}
+	return &NRGBA64{base: base, space: s}
 
 }
 
-func (n NRGB64) Bounds() image.Rectangle {
+func (n NRGBA64) Bounds() image.Rectangle {
 	return n.base.Bounds()
 }
 
-func (n NRGB64) Space() ColorSpace {
+// return the ColorSpace of the Image
+func (n NRGBA64) Space() ColorSpace {
 	return n.space
 }
 
-func (n NRGB64) Pix() []uint8 {
+// return the pixels of the base image
+func (n NRGBA64) Pix() []uint8 {
 	return n.base.Pix
 }
 
-func (n NRGB64) At(x, y int) color.Color {
+func (n NRGBA64) At(x, y int) color.Color {
 	/* can wrap
 		NRGBA 64 colour as an tsg.colour
 		if we want to preserve colour space
@@ -99,20 +82,23 @@ func (n NRGB64) At(x, y int) color.Color {
 
 	baseCol := n.base.NRGBA64At(x, y)
 	// return a colour space aware colour
-	return &CNRGBA64{R: baseCol.R, G: baseCol.G, B: baseCol.B, A: baseCol.A, Space: n.space}
+	return &CNRGBA64{R: baseCol.R, G: baseCol.G, B: baseCol.B, A: baseCol.A, ColorSpace: n.space}
 
 }
 
-func (n NRGB64) ColorModel() color.Model {
+// ColorModel retruns the *image.NRGBA64 colorModel
+func (n NRGBA64) ColorModel() color.Model {
 	return n.base.ColorModel()
 }
 
-func (n NRGB64) BaseImage() *image.NRGBA64 {
+// BaseImage returns the *image.NRGBA64
+// so it can be used with the go library
+func (n NRGBA64) BaseImage() *image.NRGBA64 {
 	return n.base
 }
 
 // utilise set for draw
-func (n NRGB64) Set(x int, y int, c color.Color) {
+func (n NRGBA64) Set(x int, y int, c color.Color) {
 
 	// update the colour if it has an explicit colour space
 	// and the base image is using colour spaces
@@ -120,6 +106,7 @@ func (n NRGB64) Set(x int, y int, c color.Color) {
 		c = transform(cmid.GetColorSpace(), n.space, c)
 	}
 
+	// use SetNRGBA64 where possible to preserve colour
 	switch convert := c.(type) {
 	case color.NRGBA64:
 		n.base.SetNRGBA64(x, y, convert)
@@ -148,7 +135,7 @@ func PngEncode(w io.Writer, m image.Image) error {
 	// cut out the NRGB64 wrapper as png
 	// doesn't know how to handle it correctly
 	// and it changes the expected values when alpha is not 0xffff
-	if mid, ok := m.(*NRGB64); ok {
+	if mid, ok := m.(*NRGBA64); ok {
 		m = mid.base
 	}
 
@@ -160,7 +147,7 @@ func TiffEncode(w io.Writer, m image.Image, opt *tiff.Options) error {
 	// cut out the NRGB64 wrapper as tiff
 	// doesn't know how to handle it correctly
 	// and it changes the expected values when alpha is not 0xffff
-	if mid, ok := m.(*NRGB64); ok {
+	if mid, ok := m.(*NRGBA64); ok {
 		m = mid.base
 	}
 

@@ -4,177 +4,24 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	"os"
 )
 
 // maxAlpha is the maximum color value returned by image.Color.RGBA.
 const maxAlpha = 1<<16 - 1
 
 /*
-
-basic draw function smpte ramps for example
-
-colour inverter
-
+CNRGBA64 behaves in the same way as color.NRGBA64
+with the added feature of a color space
 */
-
-//
-
-/*
-func testrun() {
-	/*
-
-		mkae one image setting a test pattern
-
-
-	base := image.NewNRGBA64(image.Rect(0, 0, 2000, 2000))
-	noSpace := Space{Space: "rec709"}
-	noChange := newNRGBA642(noSpace, image.Rect(0, 0, 1000, 1000))
-	b := bar{Space: noSpace}
-	b.generate(noChange)
-
-	changeSpace := Space{Space: "inverse"}
-	change := newNRGBA642(noSpace, image.Rect(0, 0, 1000, 1000))
-	cb := bar{Space: changeSpace}
-	cb.generate(change)
-
-	change601 := Space{Space: "rec601"}
-	chang601 := newNRGBA642(noSpace, image.Rect(0, 0, 1000, 1000))
-	cb601 := bar{Space: change601}
-	cb601.generate(chang601)
-
-	change709 := Space{Space: "test709"}
-	chang709 := newNRGBA642(noSpace, image.Rect(0, 0, 1000, 1000))
-	cb709 := bar{Space: change709}
-	cb709.generate(chang709)
-
-	draw.Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
-	draw.Draw(base, image.Rect(1000, 0, 2000, 1000), noChange, image.Point{}, draw.Over)
-	draw.Draw(base, image.Rect(0, 1000, 1000, 2000), chang601, image.Point{}, draw.Over)
-	draw.Draw(base, image.Rect(1000, 1000, 2000, 2000), chang709, image.Point{}, draw.Over)
-
-	f, _ := os.Create("./testdata/all.png")
-	png.Encode(f, base)
-
-}*/
-
-func testrun2() {
-	/*
-
-		mkae one image setting a test pattern
-	*/
-
-	base := image.NewNRGBA64(image.Rect(0, 0, 2000, 2000))
-	noSpace := ColorSpace{ColorSpace: "rec709"}
-	noChange := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	b := bar{Space: noSpace}
-	b.generate2(noChange)
-
-	changeSpace := ColorSpace{ColorSpace: "rec709"}
-	changeYCb := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	cb := bar{Space: changeSpace}
-	cb.generateYCbCr(changeYCb)
-
-	change601 := ColorSpace{ColorSpace: "rec601"}
-	chang601 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	cb601 := bar{Space: change601}
-	cb601.generate2(chang601)
-
-	change709 := ColorSpace{ColorSpace: "rec601"}
-	chang709 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	cb709 := bar{Space: change709}
-	cb709.generateYCbCr(chang709)
-
-	Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
-	Draw(base, image.Rect(1000, 0, 2000, 1000), changeYCb, image.Point{}, draw.Over)
-	Draw(base, image.Rect(0, 1000, 1000, 2000), chang601, image.Point{}, draw.Over)
-	Draw(base, image.Rect(1000, 1000, 2000, 2000), chang709, image.Point{}, draw.Over)
-
-	f, _ := os.Create("./testdata/all2.png")
-	PngEncode(f, base)
-
-}
-
-func testrun2020() {
-	/*
-
-		mkae one image setting a test pattern
-	*/
-
-	base := image.NewNRGBA64(image.Rect(0, 0, 2000, 2000))
-	noSpace := ColorSpace{ColorSpace: "rec2020"}
-	noChange := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	b := bar{Space: noSpace}
-	b.generate2(noChange)
-
-	changeSpace := ColorSpace{ColorSpace: "rec709"}
-	img709 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	cb := bar{Space: changeSpace}
-	cb.generate2(img709)
-
-	change601 := ColorSpace{ColorSpace: "rec601"}
-	chang601 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	cb601 := bar{Space: change601}
-	cb601.generate2(chang601)
-
-	change709 := ColorSpace{ColorSpace: "p3"}
-	changP3 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	cb709 := bar{Space: change709}
-	cb709.generate2(changP3)
-
-	Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
-	Draw(base, image.Rect(1000, 0, 2000, 1000), img709, image.Point{}, draw.Over)
-	Draw(base, image.Rect(0, 1000, 1000, 2000), changP3, image.Point{}, draw.Over)
-	Draw(base, image.Rect(1000, 1000, 2000, 2000), chang601, image.Point{}, draw.Over)
-
-	f, _ := os.Create("./testdata/all2020.png")
-	PngEncode(f, base)
-
-}
-
-func testrun709() {
-	/*
-
-		mkae one image setting a test pattern
-	*/
-
-	base := image.NewNRGBA64(image.Rect(0, 0, 2000, 2000))
-	noSpace := ColorSpace{ColorSpace: "rec709"}
-	noChange := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	b := bar{Space: ColorSpace{ColorSpace: "rec2020"}}
-	b.generate2(noChange)
-
-	changeSpace := ColorSpace{ColorSpace: "rec709"}
-	img709 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	cb := bar{Space: changeSpace}
-	cb.generate2(img709)
-
-	change601 := ColorSpace{ColorSpace: "rec601"}
-	chang601 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	cb601 := bar{Space: change601}
-	cb601.generate2(chang601)
-
-	change709 := ColorSpace{ColorSpace: "p3"}
-	changP3 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
-	cb709 := bar{Space: change709}
-	cb709.generate2(changP3)
-
-	Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
-	Draw(base, image.Rect(1000, 0, 2000, 1000), img709, image.Point{}, draw.Over)
-	Draw(base, image.Rect(0, 1000, 1000, 2000), changP3, image.Point{}, draw.Over)
-	Draw(base, image.Rect(1000, 1000, 2000, 2000), chang601, image.Point{}, draw.Over)
-
-	f, _ := os.Create("./testdata/all709.png")
-	PngEncode(f, base)
-
-}
-
 type CNRGBA64 struct {
 	// color.NRGBA64
 	R, G, B, A uint16
-	Space      ColorSpace
+	ColorSpace ColorSpace
 }
 
+// The Color interface is the same as color.Color
+// with the ability to find the colour space the
+// colour is based in.
 type Color interface {
 	color.Color
 	GetColorSpace() ColorSpace
@@ -182,31 +29,32 @@ type Color interface {
 }
 
 func (c *CNRGBA64) GetColorSpace() ColorSpace {
-	return c.Space
+	return c.ColorSpace
 }
 
 func (c *CNRGBA64) UpdateColorSpace(s ColorSpace) {
-	c.Space = s
+	c.ColorSpace = s
 }
 
 func (c *CNRGBA64) RGBA() (R, G, B, A uint32) {
 	return color.NRGBA64{R: c.R, G: c.G, B: c.B, A: c.A}.RGBA()
 }
 
-type CYCbCr struct {
+// CyCbCr is a demo version of a color.CyCbCr
+type CyCbCr struct {
 	Y, Cb, Cr uint8
 	Space     ColorSpace
 }
 
-func (c *CYCbCr) GetSpace() ColorSpace {
+func (c *CyCbCr) GetSpace() ColorSpace {
 	return c.Space
 }
 
-func (c *CYCbCr) UpdateSpace(s ColorSpace) {
+func (c *CyCbCr) UpdateSpace(s ColorSpace) {
 	c.Space = s
 }
 
-func (c *CYCbCr) RGBA() (R, G, B, A uint32) {
+func (c *CyCbCr) RGBA() (R, G, B, A uint32) {
 	return color.YCbCr{Y: c.Y, Cb: c.Cb, Cr: c.Cr}.RGBA()
 }
 
@@ -233,7 +81,7 @@ you drawing with the same images.
 func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point, mask image.Image, mp image.Point, op draw.Op) {
 
 	switch dst.(type) {
-	case *NRGB64:
+	case *NRGBA64:
 
 		// follow the draw.DrawMask generic code
 		// with a few slight differences to ensure colour space is preserved.
@@ -283,16 +131,18 @@ func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point
 
 
 					*/
-					//	atc := color.NRGBA64Model.Convert(src.At(sx, sy)).(color.NRGBA64)
+
 					srCol := src.At(sx, sy)
 					var sr, sg, sb, sa uint32
-					// this works in nrgb64, so we treat every colour as NRGB64
+
+					// this works in nrgb64, so we treat every colour as NRGB64 by getting the non multiplied values
+					// and only alpha multiplying them if we're required
 					if ncol, ok := srCol.(color.NRGBA64); ok {
 						sr, sg, sb, sa = uint32(ncol.R), uint32(ncol.G), uint32(ncol.B), uint32(ncol.A)
 					} else if cspace, ok := src.At(sx, sy).(*CNRGBA64); ok {
 
 						// transform the colour before applying it
-						tCol := transform(cspace.Space, dst.(*NRGB64).space, src.At(sx, sy))
+						tCol := transform(cspace.ColorSpace, dst.(*NRGBA64).space, src.At(sx, sy))
 						ncol := tCol.(*CNRGBA64)
 						// making sure to cut out alpha multiplied values
 						//	atc := tCol.(*CNRGBA64)
@@ -311,26 +161,6 @@ func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point
 						sr, sg, sb, sa = uint32(nrgbCol.R), uint32(nrgbCol.G), uint32(nrgbCol.B), uint32(nrgbCol.A)
 					}
 					// NRGBA64 is non alpha multiplied
-					/*
-						if op == draw.Over {
-							var tempout color.RGBA64
-							dr, dg, db, da := dst.At(x, y).RGBA()
-							a := maxAlpha - (sa * ma / maxAlpha)
-							tempout.R = uint16((dr*a + sr*ma) / maxAlpha)
-							tempout.G = uint16((dg*a + sg*ma) / maxAlpha)
-							tempout.B = uint16((db*a + sb*ma) / maxAlpha)
-							tempout.A = uint16((da*a + sa*ma) / maxAlpha)
-
-							midOut := color.NRGBA64Model.Convert(tempout).(color.NRGBA64)
-							out.R, out.G, out.B, out.A = midOut.R, midOut.G, midOut.B, midOut.A
-
-
-						} else {
-							out.R = uint16(sr * ma / maxAlpha)
-							out.G = uint16(sg * ma / maxAlpha)
-							out.B = uint16(sb * ma / maxAlpha)
-							out.A = uint16(sa * ma / maxAlpha)
-						}*/
 
 					if op == draw.Src || sa == maxAlpha {
 						out.R = uint16(sr * ma / maxAlpha)
@@ -344,6 +174,10 @@ func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point
 
 						if da == 0 {
 							out = CNRGBA64{R: uint16(sr), G: uint16(sg), B: uint16(sb), A: uint16(sa)}
+						} else if sa == 0 {
+
+							// don't draw anything as its transparent
+							continue
 						} else {
 
 							// else get the alpha multiplied version of the dst and src RGBA values
@@ -385,9 +219,9 @@ func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point
 					// @TODO double check if this is needed
 					// or double dipping transformations
 					// assign the colour space if there is one
-					if cspace, ok := src.At(sx, sy).(*CNRGBA64); ok {
-						out.Space = cspace.Space
-					}
+					//		if cspace, ok := src.At(sx, sy).(*CNRGBA64); ok {
+					//			out.ColorSpace = cspace.ColorSpace
+					//		}
 					// The third argument is &out instead of out (and out is
 					// declared outside of the inner loop) to avoid the implicit
 					// conversion to color.Color here allocating memory in the

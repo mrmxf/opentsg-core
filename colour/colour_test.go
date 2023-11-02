@@ -6,6 +6,7 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
+	"image/png"
 	"math/rand"
 	"os"
 	"testing"
@@ -44,28 +45,28 @@ func BenchmarkNRGBA64ACESSet(b *testing.B) {
 func BenchmarkNRGBA64Draw(b *testing.B) {
 	base := NewNRGBA64(ColorSpace{ColorSpace: "rec2020"}, image.Rect(0, 0, 1000, 1000))
 	for n := 0; n < b.N; n++ {
-		Draw(base, base.Bounds(), &image.Uniform{&CNRGBA64{R: 0xffff, A: 0xfff0, Space: ColorSpace{ColorSpace: "rec709"}}}, image.Point{}, draw.Src)
+		Draw(base, base.Bounds(), &image.Uniform{&CNRGBA64{R: 0xffff, A: 0xfff0, ColorSpace: ColorSpace{ColorSpace: "rec709"}}}, image.Point{}, draw.Src)
 	}
 }
 
 func BenchmarkNRGBA64ImgDraw(b *testing.B) {
 	base := NewNRGBA64(ColorSpace{ColorSpace: "rec2020"}, image.Rect(0, 0, 1000, 1000))
 	for n := 0; n < b.N; n++ {
-		draw.Draw(base, base.Bounds(), &image.Uniform{&CNRGBA64{R: 0xffff, A: 0xfff0, Space: ColorSpace{ColorSpace: "rec709"}}}, image.Point{}, draw.Src)
+		draw.Draw(base, base.Bounds(), &image.Uniform{&CNRGBA64{R: 0xffff, A: 0xfff0, ColorSpace: ColorSpace{ColorSpace: "rec709"}}}, image.Point{}, draw.Src)
 	}
 }
 
 func BenchmarkNRGBA64DrawMaxAlpha(b *testing.B) {
 	base := NewNRGBA64(ColorSpace{ColorSpace: "rec2020"}, image.Rect(0, 0, 1000, 1000))
 	for n := 0; n < b.N; n++ {
-		Draw(base, base.Bounds(), &image.Uniform{&CNRGBA64{R: 0xffff, A: 0xffff, Space: ColorSpace{ColorSpace: "rec709"}}}, image.Point{}, draw.Src)
+		Draw(base, base.Bounds(), &image.Uniform{&CNRGBA64{R: 0xffff, A: 0xffff, ColorSpace: ColorSpace{ColorSpace: "rec709"}}}, image.Point{}, draw.Src)
 	}
 }
 
 func BenchmarkNRGBA64ImgDrawMaxAlpha(b *testing.B) {
 	base := NewNRGBA64(ColorSpace{ColorSpace: "rec2020"}, image.Rect(0, 0, 1000, 1000))
 	for n := 0; n < b.N; n++ {
-		draw.Draw(base, base.Bounds(), &image.Uniform{&CNRGBA64{R: 0xffff, A: 0xffff, Space: ColorSpace{ColorSpace: "rec709"}}}, image.Point{}, draw.Src)
+		draw.Draw(base, base.Bounds(), &image.Uniform{&CNRGBA64{R: 0xffff, A: 0xffff, ColorSpace: ColorSpace{ColorSpace: "rec709"}}}, image.Point{}, draw.Src)
 	}
 }
 
@@ -94,9 +95,6 @@ func TestDraw(t *testing.T) {
 		hnormal.Write(goImplementation.Pix())
 		htest.Write(colourImplementation.Pix())
 
-		fmt.Println(colourImplementation.At(0, 0))
-		fmt.Println(goImplementation.At(0, 0))
-
 		//td, _ := os.Create("r.png")
 		//png.Encode(td, canvas)
 
@@ -110,124 +108,72 @@ func TestDraw(t *testing.T) {
 	}
 
 	colourImplementation := NewNRGBA64(ColorSpace{}, image.Rect(0, 0, 200, 200))
-	goImplementation := NewNRGBA64(ColorSpace{}, image.Rect(0, 0, 200, 200))
+
 	colours := []color.Color{
 		color.RGBA64{R: 0x7FFF, A: 0x7FFF},
 		&CNRGBA64{G: 0x7FFF, A: 0x7FFF},
 		&CNRGBA64{B: 0x7FFF, A: 0x7FFF},
 		&CNRGBA64{R: 0x6400, G: 0x6400, A: 16384},
-		&CNRGBA64{R: uint16(rand.Int63n(65535)), G: uint16(rand.Int63n(65535)), B: uint16(rand.Int63n(65535)), A: uint16(rand.Int63n(65535))},
-		&CNRGBA64{R: uint16(rand.Int63n(65535)), G: uint16(rand.Int63n(65535)), B: uint16(rand.Int63n(65535)), A: uint16(rand.Int63n(65535))},
-		&CNRGBA64{R: uint16(rand.Int63n(65535)), G: uint16(rand.Int63n(65535)), B: uint16(rand.Int63n(65535)), A: uint16(rand.Int63n(65535))},
-		&CNRGBA64{R: uint16(rand.Int63n(65535)), G: uint16(rand.Int63n(65535)), B: uint16(rand.Int63n(65535)), A: uint16(rand.Int63n(65535))},
-		&CNRGBA64{R: uint16(rand.Int63n(65535)), G: uint16(rand.Int63n(65535)), B: uint16(rand.Int63n(65535)), A: uint16(rand.Int63n(65535))},
-		&CNRGBA64{R: uint16(rand.Int63n(65535)), G: uint16(rand.Int63n(65535)), B: uint16(rand.Int63n(65535)), A: uint16(rand.Int63n(65535))},
-		&CNRGBA64{R: uint16(rand.Int63n(65535)), G: uint16(rand.Int63n(65535)), B: uint16(rand.Int63n(65535)), A: uint16(rand.Int63n(65535))},
+		&CNRGBA64{R: 0x8000, B: 0x8000, A: 49151},
+		&CNRGBA64{G: 0x6100, B: 0x9900, A: 25000},
 	}
 	// check for any deviations from go
-	for i := 0; i < 8; i++ {
-
-		// baseColour := CNRGBA64{R: uint16(rand.Int63n(65535)), G: uint16(rand.Int63n(65535)), B: uint16(rand.Int63n(65535)), A: uint16(rand.Int63n(65535))}
-		baseColour := colours[i]
-		//	sr, sg, sb, sa := uint32(baseColour.R), uint32(baseColour.G), uint32(baseColour.B), uint32(baseColour.A)
-		//	fmt.Println(sr, sg, sb, sa)
-		//	sr, sg, sb = ((sr * sa) / maxAlpha), ((sg * sa) / maxAlpha), ((sb * sa) / maxAlpha)
-		//	fmt.Println(sr, sg, sb, sa)
-
-		nrgbCol := color.NRGBA64Model.Convert(baseColour).(color.NRGBA64)
-		if (baseColour == color.RGBA64{R: 0x7FFF, A: 0x7FFF}) {
-			fmt.Println("trigger")
-		}
-
-		sr, sg, sb, sa := uint32(nrgbCol.R), uint32(nrgbCol.G), uint32(nrgbCol.B), uint32(nrgbCol.A)
-		sr, sg, sb = ((sr * sa) / maxAlpha), ((sg * sa) / maxAlpha), ((sb * sa) / maxAlpha)
-		//	sr, sg, sb, sa := baseColour.RGBA()
-		var out color.NRGBA64
-		ma := uint32(0xffff)
-		dstCol := colourImplementation.At(0, 0).(*CNRGBA64)
-		dr, dg, db, da := uint32(dstCol.R), uint32(dstCol.G), uint32(dstCol.B), uint32(dstCol.A)
-		dr, dg, db = ((dr * da) / maxAlpha), ((dg * da) / maxAlpha), ((db * da) / maxAlpha)
-		a := maxAlpha - (sa * ma / maxAlpha)
-		out.A = uint16((da*a + sa*ma) / maxAlpha)
-		out.R = uint16((dr*a + sr*ma) / uint32(out.A))
-		out.G = uint16((dg*a + sg*ma) / uint32(out.A))
-		out.B = uint16((db*a + sb*ma) / uint32(out.A))
-		fmt.Println(dr, dg, db, da, a)
-		fmt.Println(((dr*a + sr*ma) / uint32(out.A)))
-		fmt.Println(sr, sg, sb, sa)
-		fmt.Println(out)
+	for i, baseColour := range colours {
 
 		Draw(colourImplementation, colourImplementation.Bounds(), &image.Uniform{baseColour}, image.Point{}, draw.Over)
 
-		draw.Draw(goImplementation, goImplementation.Bounds(), &image.Uniform{baseColour}, image.Point{}, draw.Over)
+		// get the base file
+		baseFile, _ := os.Open(fmt.Sprintf("./testdata/draw/alphaDraw%v.png", i))
+		baseImage, _ := png.Decode(baseFile)
+		base := image.NewNRGBA64(baseImage.Bounds())
+		Draw(base, base.Bounds(), baseImage, image.Point{}, draw.Src)
 
 		hnormal := sha256.New()
 		htest := sha256.New()
-		hnormal.Write(goImplementation.Pix())
+		hnormal.Write(base.Pix)
 		htest.Write(colourImplementation.Pix())
-		fmt.Println(colourImplementation.At(0, 0), "my version")
-		fmt.Println(goImplementation.At(0, 0))
-		fmt.Println(colourImplementation.At(0, 0).RGBA()) //, "my version")
-		fmt.Println(goImplementation.At(0, 0).RGBA())
 
-		td, _ := os.Create(fmt.Sprintf("./testdata/draw/me%v.png", i))
-		PngEncode(td, colourImplementation)
-		td2, _ := os.Create(fmt.Sprintf("./testdata/draw/go%v.png", i))
-		PngEncode(td2, goImplementation)
-
-		Convey("Checking that the go and colour implementations of draw produce the same result, when no colour space is involved", t, func() {
-			Convey(fmt.Sprintf("Run using a colour of %v", baseColour), func() {
-				Convey("The hashes of the image are identical", func() {
-					So(colourImplementation.At(0, 0), ShouldResemble, &baseColour)
+		Convey("Checking that the draw function works with alpha", t, func() {
+			Convey(fmt.Sprintf("Run adding a colour of %v to the base image", baseColour), func() {
+				Convey("The hashes of the image are identical with that of the expected", func() {
+					So(htest.Sum(nil), ShouldResemble, hnormal.Sum(nil))
 				})
 			})
 		})
 	}
 
-	/*
-		testColours := []CNRGBA64{{R: 35340, A: 0xffff}, {G: 30000, B: 40000, A: 0xf0f0}, {R: 0xffff, G: 0xffff, B: 0xffff}}
+	testColours := []CNRGBA64{{R: 35340, A: 0xffff}, {G: 30000, B: 40000, A: 0xf0f0}, {R: 0xffff, G: 0xffff, B: 0xffff}}
 
-		target := []string{"fullalpha.png", "partialalpha.png", "noalpha.png"}
+	target := []string{"fullalpha.png", "partialalpha.png", "noalpha.png"}
 
-		for i, tcol := range testColours {
-			colourImplementation := NewNRGBA64(ColorSpace{ColorSpace: "rec2020"}, image.Rect(0, 0, 1000, 1000))
-			Draw(colourImplementation, colourImplementation.Bounds(), &image.Uniform{&tcol}, image.Point{}, draw.Src)
-			//	goImplementation := image.NewNRGBA64(image.Rect(0, 0, 1000, 1000))
-			//Draw(goImplementation, goImplementation.Bounds(), &image.Uniform{&tcol}, image.Point{}, draw.Src)
+	for i, tcol := range testColours {
+		colourImplementation := NewNRGBA64(ColorSpace{ColorSpace: "rec2020"}, image.Rect(0, 0, 1000, 1000))
+		Draw(colourImplementation, colourImplementation.Bounds(), &image.Uniform{&tcol}, image.Point{}, draw.Src)
 
-			baseFile, _ := os.Open("./testdata/draw/" + target[i])
+		baseFile, _ := os.Open("./testdata/draw/" + target[i])
+	
 
-			//PngEncode(basePng, colourImplementation.base)
+		//PngEncode(basePng, colourImplementation.base)
 			baseImage, _ := png.Decode(baseFile)
 
-			testFormat := image.NewNRGBA64(baseImage.Bounds())
+		testFormat := image.NewNRGBA64(baseImage.Bounds())
 			Draw(testFormat, testFormat.Bounds(), baseImage, image.Point{}, draw.Src)
-			//
-			hnormal := sha256.New()
-			htest := sha256.New()
+		//
+		hnormal := sha256.New()
+		htest := sha256.New()
 			hnormal.Write(testFormat.Pix)
-			htest.Write(colourImplementation.Pix())
+		htest.Write(colourImplementation.Pix())
 
-			fmt.Println(baseImage.At(0, 0).RGBA())
-			fmt.Println(testFormat.At(0, 0).RGBA())
-			fmt.Println(colourImplementation.At(0, 0).RGBA())
 
-			Convey("Checking that the transformation produces the expected results", t, func() {
-				Convey(fmt.Sprintf("Run checking %v", target[i]), func() {
-					Convey("The hashes of the image are identical", func() {
-						So(htest.Sum(nil), ShouldResemble, hnormal.Sum(nil))
-					})
+		Convey("Checking that the transformation produces the expected results", t, func() {
+			Convey(fmt.Sprintf("Run checking %v", target[i]), func() {
+				Convey("The hashes of the image are identical", func() {
+					So(htest.Sum(nil), ShouldResemble, hnormal.Sum(nil))
 				})
 			})
-		}
+		})
+	}
 
-		base := NewNRGBA64(ColorSpace{}, image.Rect(0, 0, 2000, 1000))
-
-		fmt.Println(base.At(500, 500))
-		//base.Set(500, 500, &colour.CNRGBA64{R: 65335, A: 0xffff, Space: colour.ColorSpace{ColorSpace: "rec709"}})
-
-		Draw(base, image.Rect(400, 400, 600, 600), &image.Uniform{&CNRGBA64{R: 65335, A: 0xffff, Space: ColorSpace{ColorSpace: "rec709"}}}, image.Point{}, draw.Src)
-		fmt.Println(base.At(500, 500))*/
 	/*
 		f, _ := os.Create("./testdata/colour.png")
 		png.Encode(f, base)
@@ -240,4 +186,115 @@ func TestDraw(t *testing.T) {
 		png.Encode(fdraw, basedraw)*/
 
 	// set some base test transformations
+}
+
+func testrun2() {
+	/*
+
+		mkae one image setting a test pattern
+	*/
+
+	base := image.NewNRGBA64(image.Rect(0, 0, 2000, 2000))
+	noSpace := ColorSpace{ColorSpace: "rec709"}
+	noChange := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
+	b := bar{Space: noSpace}
+	b.generate2(noChange)
+
+	changeSpace := ColorSpace{ColorSpace: "rec709"}
+	changeYCb := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
+	cb := bar{Space: changeSpace}
+	cb.generateYCbCr(changeYCb)
+
+	change601 := ColorSpace{ColorSpace: "rec601"}
+	chang601 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
+	cb601 := bar{Space: change601}
+	cb601.generate2(chang601)
+
+	change709 := ColorSpace{ColorSpace: "rec601"}
+	chang709 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
+	cb709 := bar{Space: change709}
+	cb709.generateYCbCr(chang709)
+
+	Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
+	Draw(base, image.Rect(1000, 0, 2000, 1000), changeYCb, image.Point{}, draw.Over)
+	Draw(base, image.Rect(0, 1000, 1000, 2000), chang601, image.Point{}, draw.Over)
+	Draw(base, image.Rect(1000, 1000, 2000, 2000), chang709, image.Point{}, draw.Over)
+
+	f, _ := os.Create("./testdata/all2.png")
+	PngEncode(f, base)
+
+}
+
+func testrun2020() {
+	/*
+
+		mkae one image setting a test pattern
+	*/
+
+	base := image.NewNRGBA64(image.Rect(0, 0, 2000, 2000))
+	noSpace := ColorSpace{ColorSpace: "rec2020"}
+	noChange := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
+	b := bar{Space: noSpace}
+	b.generate2(noChange)
+
+	changeSpace := ColorSpace{ColorSpace: "rec709"}
+	img709 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
+	cb := bar{Space: changeSpace}
+	cb.generate2(img709)
+
+	change601 := ColorSpace{ColorSpace: "rec601"}
+	chang601 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
+	cb601 := bar{Space: change601}
+	cb601.generate2(chang601)
+
+	change709 := ColorSpace{ColorSpace: "p3"}
+	changP3 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
+	cb709 := bar{Space: change709}
+	cb709.generate2(changP3)
+
+	Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
+	Draw(base, image.Rect(1000, 0, 2000, 1000), img709, image.Point{}, draw.Over)
+	Draw(base, image.Rect(0, 1000, 1000, 2000), changP3, image.Point{}, draw.Over)
+	Draw(base, image.Rect(1000, 1000, 2000, 2000), chang601, image.Point{}, draw.Over)
+
+	f, _ := os.Create("./testdata/all2020.png")
+	PngEncode(f, base)
+
+}
+
+func testrun709() {
+	/*
+
+		mkae one image setting a test pattern
+	*/
+
+	base := image.NewNRGBA64(image.Rect(0, 0, 2000, 2000))
+	noSpace := ColorSpace{ColorSpace: "rec709"}
+	noChange := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
+	b := bar{Space: ColorSpace{ColorSpace: "rec2020"}}
+	b.generate2(noChange)
+
+	changeSpace := ColorSpace{ColorSpace: "rec709"}
+	img709 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
+	cb := bar{Space: changeSpace}
+	cb.generate2(img709)
+
+	change601 := ColorSpace{ColorSpace: "rec601"}
+	chang601 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
+	cb601 := bar{Space: change601}
+	cb601.generate2(chang601)
+
+	change709 := ColorSpace{ColorSpace: "p3"}
+	changP3 := NewNRGBA64(noSpace, image.Rect(0, 0, 1000, 1000))
+	cb709 := bar{Space: change709}
+	cb709.generate2(changP3)
+
+	Draw(base, image.Rect(0, 0, 1000, 1000), noChange, image.Point{}, draw.Over)
+	Draw(base, image.Rect(1000, 0, 2000, 1000), img709, image.Point{}, draw.Over)
+	Draw(base, image.Rect(0, 1000, 1000, 2000), changP3, image.Point{}, draw.Over)
+	Draw(base, image.Rect(1000, 1000, 2000, 2000), chang601, image.Point{}, draw.Over)
+
+	f, _ := os.Create("./testdata/all709.png")
+	PngEncode(f, base)
+
 }

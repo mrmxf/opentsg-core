@@ -11,6 +11,7 @@ var (
 			ColorSpace{ColorSpace: "rec709"}: inverse},
 	}
 
+	// this is a working idea of how to handle luts
 	lutLibrary = map[ColorSpace]map[ColorSpace]any{ // where any is a lut
 
 	}
@@ -18,7 +19,7 @@ var (
 	// chromatic adaptation needs to be included as well
 
 	// rec 601 here http://www.brucelindbloom.com/index.html?WorkingSpaceInfo.html under PAL/SECAM RGB
-	RGBToXYZ = map[string][3][3]float64{
+	rGBToXYZ = map[string][3][3]float64{
 		"rec709":  {{0.4124564, 0.3575761, 0.1804375}, {0.2126729, 0.7151522, 0.0721750}, {0.0193339, 0.1191920, 0.9503041}},
 		"rec601":  {{0.4306190, 0.3415419, 0.1783091}, {0.2220379, 0.7066384, 0.0713236}, {0.0201853, 0.1295504, 0.9390944}},
 		"test709": {{0.41239079926595923, 0.3575843393838781, 0.18048078840183424}, {0.21263900587151024, 0.7151686787677562, 0.0721923153607337}, {0.019330818715591818, 0.119194779794626, 0.9505321522496605}},
@@ -26,7 +27,7 @@ var (
 		"rec2020": {{0.6369580483012911, 0.14461690358620835, 0.1688809751641721}, {0.262700212011267, 0.6779980715188709, 0.05930171646986196}, {4.994106574466074e-17, 0.028072693049087435, 1.060985057710791}},
 	}
 
-	XYZtoRGB = map[string][3][3]float64{
+	xYZtoRGB = map[string][3][3]float64{
 		"rec709":  {{3.2404542, -1.5371385, -0.4985314}, {-0.9692660, 1.8760108, 0.0415560}, {0.0556434, -0.2040259, 1.0572252}},
 		"rec601":  {{3.0628971, -1.3931791, -0.4757517}, {-0.9692660, 1.8760108, 0.0415560}, {0.0678775, -0.2288548, 1.0693490}},
 		"test709": {{3.240969941904524, -1.5373831775700946, -0.49861076029300366}, {-0.9692436362808796, 1.87596750150772, 0.041555057407175626}, {0.05563007969699367, -0.20397695888897657, 1.0569715142428788}},
@@ -35,6 +36,7 @@ var (
 	}
 )
 
+/* demo struct ideas
 type lut1D struct {
 }
 type lut3D struct {
@@ -42,24 +44,25 @@ type lut3D struct {
 
 type lut interface {
 	lut1D | lut3D
-}
+}*/
 
-func transform(input, output ColorSpace, cols color.Color) color.Color {
+// transform transforms a colour from an input colourspace to
+// an output colour space.
+func transform(input, output ColorSpace, inputColor color.Color) color.Color {
 
-	//fmt.Println(input, output)
-	// fmt.Println(input, output)
 	// if the colour spaces match or one isn't declared
 	if input.ColorSpace == output.ColorSpace || (input == ColorSpace{}) || (output == ColorSpace{}) {
-		return cols
+		return inputColor
 	}
 
 	// else get transformation
 	tf := getTransform(input, output)
 	// apply transformation
 
-	return tf(cols)
+	return tf(inputColor)
 }
 
+// getTransform builds the transformation function from the two given colour spaces.
 func getTransform(input, output ColorSpace) func(color.Color) color.Color {
 
 	/*
@@ -87,9 +90,10 @@ func getTransform(input, output ColorSpace) func(color.Color) color.Color {
 	// we get an input output and transform type
 	// decide which one takes precedence
 
-	return matrixTransform(RGBToXYZ[input.ColorSpace], XYZtoRGB[output.ColorSpace])
+	return matrixTransform(rGBToXYZ[input.ColorSpace], xYZtoRGB[output.ColorSpace])
 }
 
+// inverse was a demo colour transformation
 func inverse(c color.Color) color.Color {
 	r, g, b, a := c.RGBA()
 	if a == 0xffff {
@@ -106,6 +110,9 @@ func inverse(c color.Color) color.Color {
 	return color.NRGBA64{0xffff - uint16(r), 0xffff - uint16(g), 0xffff - uint16(b), uint16(a)}
 }
 
+// matrix tranform generates a transformation from two matrices
+// one is RGB to XYZ colour space and the other is RGB to XYZ
+// chromatic adaptation is not yet factored in
 func matrixTransform(xyz, rgb [3][3]float64) func(color.Color) color.Color {
 
 	return func(input color.Color) color.Color {
@@ -136,16 +143,4 @@ func matrixTransform(xyz, rgb [3][3]float64) func(color.Color) color.Color {
 		return &CNRGBA64{R: uint16(aR), G: uint16(aG), B: uint16(aB), A: uint16(A)}
 
 	}
-}
-
-// cliipinig func
-
-func lutTransform() {
-	/*
-	   1d or 3d lut
-
-	   extrapolate where colours are and match the colour to that
-
-	   it has a type 1dlut etc with some metadata
-	*/
 }

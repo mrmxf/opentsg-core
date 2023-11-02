@@ -27,6 +27,13 @@ type data struct {
 
 // FrameWidgetsGenerator runs the create frame for the given position. Applying any updates required and generating any
 // extra json from data. It returns an initial context with all the frame and configuration information.
+/*
+The widgets are found by depth first tree traversal, where properties are passed by property and not value.
+
+This means each include statement is searched when it is found and the order widgets
+are declared in this format, is the order they are run.
+
+*/
 func FrameWidgetsGenerator(c context.Context, pos int, debug bool) (context.Context, []error) {
 	var allError []error
 
@@ -421,10 +428,10 @@ func (b *base) widgetHandler(createUpdate map[string]any, dotPath, dotExt string
 	//update createUpdate here
 
 	// @ ADDED
-	fmt.Println(createUpdate, "CREATE UPDa")
+
 	md, ud := b.metadataGetter(createUpdate, dotPath)
 	res, err := objectMustacheUpdater(ud, md, dotPath, dotExt, "")
-	fmt.Println(res, err)
+
 	if err != nil {
 		return []jsonUpdate{}, err
 	}

@@ -20,7 +20,7 @@ func TestTransfromRT(t *testing.T) {
 		R := uint16(rand.Int63n(4095))
 		G := uint16(rand.Int63n(4095))
 		B := uint16(rand.Int63n(4095))
-		base := &CNRGBA64{R: uint16(R << 4), G: uint16(G << 4), B: uint16(B << 4), A: 0xffff, Space: ColorSpace{ColorSpace: "p3"}}
+		base := &CNRGBA64{R: uint16(R << 4), G: uint16(G << 4), B: uint16(B << 4), A: 0xffff, ColorSpace: ColorSpace{ColorSpace: "p3"}}
 		fmt.Println(base)
 		//	res := transform(ColorSpace{ColorSpace: "p3"}, ColorSpace{ColorSpace: "rec2020"}, base)
 
@@ -48,13 +48,13 @@ func TestTransfromRT(t *testing.T) {
 		gR, gG, gB, _ := finalDest.At(0, 0).RGBA()
 		fmt.Println(finalDest.At(0, 0).RGBA())
 		fmt.Println(R, uint16(math.Round(float64(gR)/16)), G, gG>>4, B, gB>>4)
-		//works with a rounding method that is computationally expensve than bit sifting
+		//works with a rounding method that i computationally expensve than bit sifting
 		// +1 an be accounted for -1 can not as the bytes go in the other direction leading to differences
-		fmt.Printf("R:%016b, gR:%016b, G:%016b, gG:%016b, b:%016b, gB:%016b\n", R, gR, G, gG, B, gB)
-		fmt.Printf("R:%016b, gR:%016b, G:%016b, gG:%016b, b:%016b, gB:%016b\n", R, gR>>4, G, gG>>4, B, gB>>4)
-		Convey("Checking that the go and colour implementations of draw produce the same result, when no colour space is involved", t, func() {
-			Convey(fmt.Sprintf("Run using a colour of %v", "baseColour"), func() {
-				Convey("The hashes of the image are identical", func() {
+		//	fmt.Printf("R:%016b, gR:%016b, G:%016b, gG:%016b, b:%016b, gB:%016b\n", R, gR, G, gG, B, gB)
+		// fmt.Printf("R:%016b, gR:%016b, G:%016b, gG:%016b, b:%016b, gB:%016b\n", R, gR>>4, G, gG>>4, B, gB>>4)
+		Convey("Checking that you can roundtrip colours from different colour spaces", t, func() {
+			Convey(fmt.Sprintf("Rountripping %v from rec2020 to rec709", base), func() {
+				Convey("The intial 12 bit colour is preserved when translating the colour back to 12 bit from 16 bit", func() {
 					So(R, ShouldResemble, uint16(math.Round(float64(gR)/16)))
 					So(G, ShouldResemble, uint16(math.Round(float64(gG)/16)))
 					So(B, ShouldResemble, uint16(math.Round(float64(gB)/16)))
