@@ -4,12 +4,39 @@ tpg-core contains all the engine and core functionality for running openTSG.
 
 ## ColourSpace Documentation
 
-All images use the colour space module. It is an image.NRGBA64 wrapped with a colour space.
+If a colour space is declared than the images use the colour space module. It is an image.NRGBA64 wrapped with a
+colour space, so that if a colour from a different space is used it can be transformed using one
+of the builtin transform functions.
 These combine with the CNRGBA64 colours, which are the same as color.NRGBA64 but with a colourspace.
 When setting a colourspace aware image with a colour space aware colour, the colours are transformed,
-to match the destination (image) colourspace, on a per pixel basis. This is due to awrapping of the set method.
+to match the destination (image) colourspace, on a per pixel basis.
 
-Different transformation methods will be implemented. Currently matrix transformations are used
+This transformations are included in the NRGBA64 Set method and when using the Draw and DrawMask functions.
+
+Different transformation methods will be implemented. Currently only matrix transformations are used
+
+## Factories and metadata
+
+When generating the widgets, the factories are searched in a depth first manner. That means every time a URI is
+encountered its children and any further children are processed, before its siblings in the factory.
+
+The metadata assignment works, each factory or widget declares which metadata keys it uses
+(this can be none).
+On the generation of the widgets and factories the base metadata values are set using these keys
+where metadata is split from the inline update and stored in the metadata "bucket".
+This base metadata "bucket" is not overwritten by later updates and is
+generated on a per frame basis. And is used for applying metadata
+updates to the widgets. The workflow is the widget gets it argument keys, it searches these
+keys in the metadata bucket of its parents, overwriting recieved  from 
+the bucket metadata as it goes.
+
+Wdigets can inherit any metadata that matches the declared argument keys, from their parents.
+With more specific metadata overwriting previous values.
+
+Then as the dotpath and array updates are applied, they will use these metadata values, unless
+a new metadata value is called as part of that dot path.
+
+The input factory does not have declared metadata.
 
 ## Getting started
 

@@ -97,7 +97,14 @@ func ImageGenerator(c context.Context, canvasSize image.Rectangle) draw.Image {
 		return aces.NewARGBA(canvasSize)
 	}
 
-	return colour.NewNRGBA64(colourSpaceType(c), canvasSize)
+	space := colourSpaceType(c)
+	switch space {
+	case colour.ColorSpace{}:
+		// if there's no colour space jsut use the base go images for performance
+		return image.NewNRGBA64(canvasSize)
+	default:
+		return colour.NewNRGBA64(space, canvasSize)
+	}
 
 }
 
@@ -274,6 +281,14 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 	squareX := (*c).Value(xkey).(float64)
 	squareY := (*c).Value(ykey).(float64)
 
+	// @TODO insert an offset function here
+	/*
+		this needs to contain the offset in pre canvas sizes as it could lead to slight offsets
+		needs to be in raw coordinates and added to the multiplication. Because of
+		the rounding nature of finding the coordinates. Then can apply offset even if its 0 to all
+		calculations
+	*/
+
 	aliasMap := core.GetAlias(*c)
 	// TODO clean the switch statement by making everything a function of grid
 	switch {
@@ -380,6 +395,7 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 
 		return generatedGridInfo, fmt.Errorf(invalidGrid, gridString)
 	}
+
 	// generate the image based on the user input to ensure continuity
 	generatedGridInfo.GImage = ImageGenerator(*c, image.Rect(0, 0, generatedGridInfo.w, generatedGridInfo.h))
 
