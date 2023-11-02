@@ -3,8 +3,9 @@
         {"uri": "frame.json", "name":"frame", "args":["swatchType"]}
     ],
     "create":[
-        {"frame": {"swatchType":"blue"}, "frame.canvas":{"swatchType":"green","linewidth": 0.5,"name":["000-{{swatchType}}-{{framenumber}}.json"]},
-    "frame.swatch.blueR1.CD1.B2":{"swatchType":"green"}},
+        {"frame": {"swatchType":"blue"}, "frame.canvas":{"swatchTyper":"blue","linewidth": 0.5,"name":["000-{{swatchTyper}}-{{framenumber}}.json"]
+        }
+  },
         {"frame": {"swatchType":"green"}}
     ]
 }

@@ -224,7 +224,8 @@ image
 
 Further more this uses NRGBA64 as a base to set colours, rather than the RGBA64 model
 favoured by go. This means that the non alpha multiplied RGB values are used unless
-required when alpha is neither 0 or maxAlpha
+required when alpha is neither 0 or maxAlpha. This leads to slight discrepancies
+with the go value, but this is more accurate.
 
 This function is only recommended when using NRGB64 images that are colour space aware and
 you drawing with the same images.

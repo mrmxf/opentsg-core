@@ -12,7 +12,7 @@
                 "properties": {
                     "uri": {
                         "type": "string",
-                        "pattern": "^[\\w\\W]{1,255}\\.[jJ][sS][oO][nN]$",
+                        "pattern": "^[\\w\\W]{1,255}\\.(([jJ][sS][oO][nN])|([yY][aA][mM][lL]))",
                         "description": "## Example\n### Acceptable inputs\n- myfile.json\n\n- ./myfolder/myfile.JSON\n- 這是有效的文件名.json\n### Invalid Inputs\n- ramps.jsn"
                     },
                     "name": {

@@ -12,11 +12,6 @@
     ],
     "args": [
       {
-        "name": "swatchParams",
-        "type": "string",
-        "doc": "string index of imported swatch"
-      },
-      {
         "name": "frameNumber",
         "type": "number",
         "doc": "number of the current frame - remove framecounter as it is a magic string etc"
@@ -28,7 +23,7 @@
           "name": [{"R":"[:]"}, {"CD":"[:]"}, {"B":"[:]"}],
           "action": {
            "pyramid" : {
-           "d.{{swatchParams}}": ["grid.location","backgroundcolor"]}
+           "d.{{swatchType}}": ["grid.location","backgroundcolor"]}
           }
        
       }

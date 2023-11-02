@@ -28,14 +28,14 @@
           "name": [{"R":"[:]"}, {"C":"[:]"}, {"B":"[:]"}],
           "action": {
            "pyramid" : {
-           "d.{{swatchParams}}": ["grid.location","backgroundcolor"]}
+           "d.{{swatchType}}": ["grid.location","backgroundcolor"]}
           }
       },
       {
           "name": [{"R":"[0]"}, {"C":"[0]"}, {"B":"[0]"}],
           "action": {
            "pyramid" : {
-           "d.{{swatchParams}}": ["grid.location"]}
+           "d.{{swatchType}}": ["grid.location"]}
           }
       }
     ]

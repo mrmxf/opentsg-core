@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
@@ -120,6 +121,7 @@ func TestYamlRead(t *testing.T) {
 
 		for i, pv := range predictedValuesYaml {
 			n, _ := FrameWidgetsGenerator(cYaml, i, false)
+
 			expec, got := genHash(n, pv)
 
 			Convey("Checking arguments are parsed correctly both in the create and generate section of yaml json factories", t, func() {
@@ -146,8 +148,8 @@ func TestYamlRead(t *testing.T) {
 	predictedValues := []string{"./testdata/frame_generate/results/blue.yaml", "./testdata/frame_generate/results/green.yaml"}
 
 	for i, pv := range predictedValues {
-		n, _ := FrameWidgetsGenerator(cYaml, i, false)
-
+		n, es := FrameWidgetsGenerator(cYaml, i, false)
+		fmt.Println(es, "second erro")
 		expec, got := genHash(n, pv)
 		bar := n.Value(baseKey).(map[string]widgetContents)
 
@@ -163,6 +165,10 @@ func TestYamlRead(t *testing.T) {
 
 		fmt.Printf("\n\n\n")
 		fmt.Println(frameJSON, "end")
+
+		b, _ := json.Marshal(frameJSON)
+		res, _ := os.Create("./testdata/frame_generate2/res.json")
+		res.Write(b)
 
 		Convey("Checking arguments are parsed correctly both in the create and generate section of json factories with the new method", t, func() {
 			Convey(fmt.Sprintf("Using frame %v ./testdata/sequnce.json as the input ", i), func() {

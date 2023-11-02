@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/draw"
 	"image/png"
+	"math"
 	"math/rand"
 	"os"
 	"testing"
@@ -46,16 +47,17 @@ func TestTransfromRT(t *testing.T) {
 
 		gR, gG, gB, _ := finalDest.At(0, 0).RGBA()
 		fmt.Println(finalDest.At(0, 0).RGBA())
-		fmt.Println(R, gR>>4, G, gG>>4, B, gB>>4)
+		fmt.Println(R, uint16(math.Round(float64(gR)/16)), G, gG>>4, B, gB>>4)
+		//works with a rounding method that is computationally expensve than bit sifting
 		// +1 an be accounted for -1 can not as the bytes go in the other direction leading to differences
 		fmt.Printf("R:%016b, gR:%016b, G:%016b, gG:%016b, b:%016b, gB:%016b\n", R, gR, G, gG, B, gB)
 		fmt.Printf("R:%016b, gR:%016b, G:%016b, gG:%016b, b:%016b, gB:%016b\n", R, gR>>4, G, gG>>4, B, gB>>4)
 		Convey("Checking that the go and colour implementations of draw produce the same result, when no colour space is involved", t, func() {
 			Convey(fmt.Sprintf("Run using a colour of %v", "baseColour"), func() {
 				Convey("The hashes of the image are identical", func() {
-					So(R, ShouldResemble, gR>>4)
-					So(G, ShouldResemble, gG>>4)
-					So(B, ShouldResemble, gB>>4)
+					So(R, ShouldResemble, uint16(math.Round(float64(gR)/16)))
+					So(G, ShouldResemble, uint16(math.Round(float64(gG)/16)))
+					So(B, ShouldResemble, uint16(math.Round(float64(gB)/16)))
 				})
 			})
 		})

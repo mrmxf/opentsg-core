@@ -1,6 +1,6 @@
 {
     "include":[
-        {"uri": "frame_recurse.json", "name":"frame"}
+        {"uri": "frame_recurse.json", "name":"frame", "args":["swatchType"]}
     ],
     "create":[
         {"frame": {"swatchType":"blue"}},

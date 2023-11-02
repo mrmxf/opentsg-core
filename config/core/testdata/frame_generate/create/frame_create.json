@@ -7,15 +7,8 @@
         "`swatchType` property is set by parent"
     ],
     "include": [
-        {"uri":"canvas.json", "name":"canvas"},
-        {"uri":"../generate/pyramid.json", "name":"swatch"}
-    ],
-    "args":[
-        {
-            "name":"swatchType",
-            "type": "string",
-            "doc" :"just a string for substitution in lower levels"
-        }
+        {"uri":"canvas.json", "name":"canvas", "args":["swatchType"]},
+        {"uri":"../generate/pyramid.json", "name":"swatch", "args":["swatchType"]}
     ],
     "create":[
         {

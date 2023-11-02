@@ -101,6 +101,7 @@ func (b *base) factoryInit(jsonFactory factory, path, parent string, positions [
 				fileBytes, err = os.ReadFile(inputPath)
 			}
 		}
+
 		if err == nil {
 
 			// check if the bytes have children by being a json factory
@@ -109,6 +110,7 @@ func (b *base) factoryInit(jsonFactory factory, path, parent string, positions [
 			if err != nil {
 				return fmt.Errorf("0005 error parsing %s: %v", inputPath, err)
 			}
+
 			if _, ok := b.importedWidgets[parent+f.Name]; ok {
 				return fmt.Errorf("0006 the alias %s is repeated, every alias is required to be unique", parent+f.Name)
 			} else if _, ok := b.importedFactories[parent+f.Name]; ok {
@@ -125,7 +127,6 @@ func (b *base) factoryInit(jsonFactory factory, path, parent string, positions [
 			var validatorError error
 			if err := validator.SchemaValidator(incschema, fileBytes, parent, factLines); err != nil {
 				// @TODO include a better error handling method
-
 				b.importedWidgets[parent+f.Name] = fileBytes
 				validatorError = validator.Liner(fileBytes, inputPath, "widget", b.jsonFileLines)
 			} else {

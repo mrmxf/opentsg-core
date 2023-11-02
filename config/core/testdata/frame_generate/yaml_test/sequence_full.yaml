@@ -1,6 +1,8 @@
 include:
-- uri: ../frame.json
+- uri: ./frame.yaml
   name: frame
+  args: 
+    - swatchType
 create:
 - frame:
     swatchType: blue

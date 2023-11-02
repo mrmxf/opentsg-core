@@ -8,24 +8,17 @@
         "`swatchType` property is set by parent"
     ],
     "include": [
-        {"uri":"../pyramid.json", "name":"pyramid0"},
-        {"uri":"../pyramid.json", "name":"pyramid1"},
-        {"uri":"../pyramid.json", "name":"pyramid2"},
-        {"uri":"../pyramid.json", "name":"pyramid3"},
-        {"uri":"../pyramid.json", "name":"pyramid4"},
-        {"uri":"../pyramid.json", "name":"pyramid5"},
-        {"uri":"../pyramid.json", "name":"pyramid6"}
-    ],
-    "args":[
-        {
-            "name": "swatchParams",
-            "type": "string",
-            "doc": "string index of imported swatch"
-          }
+        {"uri":"../pyramid.json", "name":"pyramid0", "args":["swatchType"]},
+        {"uri":"../pyramid.json", "name":"pyramid1", "args":["swatchType"]},
+        {"uri":"../pyramid.json", "name":"pyramid2", "args":["swatchType"]},
+        {"uri":"../pyramid.json", "name":"pyramid3", "args":["swatchType"]},
+        {"uri":"../pyramid.json", "name":"pyramid4", "args":["swatchType"]},
+        {"uri":"../pyramid.json", "name":"pyramid5", "args":["swatchType"]},
+        {"uri":"../pyramid.json", "name":"pyramid6", "args":["swatchType"]}
     ],
     "create":[
         {
-            "pyramid0" :{"te":"{{swatchParams}}"},
+            "pyramid0" :{"te":"{{swatchType}}"},
             "pyramid1" :{},
             "pyramid2" :{},
             "pyramid3" :{},
