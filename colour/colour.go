@@ -1,3 +1,4 @@
+// Package colour contains all the functions for utilising colour spaces in OpenTSG
 package colour
 
 import (
@@ -76,7 +77,7 @@ required when alpha is neither 0 or maxAlpha. This leads to slight discrepancies
 with the go value, but this is more accurate.
 
 This function is only recommended when using NRGB64 images that are colour space aware and
-you drawing with the same images.
+you drawing with the same base images.
 */
 func DrawMask(dst draw.Image, r image.Rectangle, src image.Image, sp image.Point, mask image.Image, mp image.Point, op draw.Op) {
 

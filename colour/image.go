@@ -62,7 +62,7 @@ func (n NRGBA64) Bounds() image.Rectangle {
 	return n.base.Bounds()
 }
 
-// return the ColorSpace of the Image
+// Space returns the ColorSpace of the Image
 func (n NRGBA64) Space() ColorSpace {
 	return n.space
 }
@@ -97,7 +97,8 @@ func (n NRGBA64) BaseImage() *image.NRGBA64 {
 	return n.base
 }
 
-// utilise set for draw
+// Set is the same as image.NRGBA64.Set(), but with
+// a colour transform before setting the image.
 func (n NRGBA64) Set(x int, y int, c color.Color) {
 
 	// update the colour if it has an explicit colour space
@@ -121,15 +122,9 @@ func (n NRGBA64) Set(x int, y int, c color.Color) {
 	// fmt.Println(n.base.At(x, y))
 }
 
-/*
-use draw and set
-
-because the draw removes the colour transformation from set.
-
-The only issue is add image, but this will be a beast unto itself
-
-*/
-
+// PNGEncode is a wrapper of png.Encode, it allows
+// the NRGBA64 image to pass the base *image.NRGBA64
+// to the encoder so the png is saved properly.
 func PngEncode(w io.Writer, m image.Image) error {
 
 	// cut out the NRGB64 wrapper as png
@@ -142,6 +137,9 @@ func PngEncode(w io.Writer, m image.Image) error {
 	return png.Encode(w, m)
 }
 
+// TiffEncode is a wrapper of png.Encode, it allows
+// the NRGBA64 image to pass the base *image.NRGBA64
+// to the encoder so the tiff is saved properly.
 func TiffEncode(w io.Writer, m image.Image, opt *tiff.Options) error {
 
 	// cut out the NRGB64 wrapper as tiff
