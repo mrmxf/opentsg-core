@@ -41,11 +41,12 @@ func AssignRGBValues(colour string, rgb, maxBlack, maxWhite int) ([3]int, error)
 }
 
 // HexToColour takes a string and returns a colour value, extracting the rgba values from the string. When no alpha channel
-// is found the alpha is set to be the max.
+// is found the alpha is set to be the max 16 bit value.
 //
 // Acceptable formats are #rgb, #rgba, #rrggbb, ##rrggbbaa, rgb(r,g,b), rgba(r,g,b,a), rgb12(r,g,b) and rgba12(r,g,b,a)
 //
 // The resulting value is either color.NRGBA or color.NRBGA64, 12 bit RGB values are represented in 16 bit NRGBA64.
+// If the alpha channel is found and its the maximum value the maximum 16 bit value is used.
 func HexToColour(colorCode string, space colour.ColorSpace) *colour.CNRGBA64 {
 	var base *colour.CNRGBA64
 	regRRGGBB := regexp.MustCompile(`^#[A-Fa-f0-9]{6}$`)
