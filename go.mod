@@ -1,4 +1,4 @@
-module github.com/mmTristan/opentsg-core
+module github.com/mrmxf/opentsg-core
 
 go 1.21.3
 
@@ -9,7 +9,7 @@ require (
 	github.com/cespare/xxhash v1.1.0
 	github.com/fogleman/gg v1.3.0
 	github.com/matoous/go-nanoid v1.5.0
-	github.com/mmTristan/opentsg-widgets v0.0.0-20231102133447-daa36fe59eef
+	github.com/mrmxf/opentsg-widgets v0.0.0-20231102133447-daa36fe59eef
 	github.com/mrmxf/opentsg-io v0.0.0-20230830164134-91af35b9a721
 	github.com/mrmxf/opentsg-mhl v0.0.0-20230713210602-b4af671ab2ac
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
