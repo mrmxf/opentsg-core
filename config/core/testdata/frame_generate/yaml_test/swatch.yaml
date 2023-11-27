@@ -12,9 +12,6 @@ include:
   name: d
 
 args: 
-- name: "swatchParams"
-  type: "string"
-  doc: "string index of imported swatch"
 - name: "frameNumber"
   type: "number"
   doc: "number of the current frame - remove framecounter as it is a magic string etc"
@@ -27,7 +24,7 @@ generate:
   - B: "[:]"
   action:
     pyramid : 
-      "d.{{swatchParams}}": 
+      "d.{{swatchType}}": 
         - grid.location
         - backgroundcolor
   

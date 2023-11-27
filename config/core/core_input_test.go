@@ -1,11 +1,13 @@
 package core
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
+	"gopkg.in/yaml.v3"
 )
 
 /*
@@ -88,8 +90,6 @@ func TestBadJson(t *testing.T) {
 	}
 }
 
-
-
 func TestJsonRread(t *testing.T) {
 	inputFile := "./testdata/frame_generate/sequence.json"
 	c, _, _ := FileImport(inputFile, "", false)
@@ -121,6 +121,7 @@ func TestYamlRead(t *testing.T) {
 
 		for i, pv := range predictedValuesYaml {
 			n, _ := FrameWidgetsGenerator(cYaml, i, false)
+
 			expec, got := genHash(n, pv)
 
 			Convey("Checking arguments are parsed correctly both in the create and generate section of yaml json factories", t, func() {
@@ -131,5 +132,50 @@ func TestYamlRead(t *testing.T) {
 				})
 			})
 		}
+	}
+
+	/*
+
+		test the new method here
+
+		fix the several bits repeating overthem selves
+
+	*/
+
+	newDesign := "./testdata/frame_generate2/sequence.json"
+	cYaml, _, e := FileImport(newDesign, "", false)
+	fmt.Println(e, "input error")
+	predictedValues := []string{"./testdata/frame_generate/results/blue.yaml", "./testdata/frame_generate/results/green.yaml"}
+
+	for i, pv := range predictedValues {
+		n, es := FrameWidgetsGenerator(cYaml, i, false)
+		fmt.Println(es, "second erro")
+		expec, got := genHash(n, pv)
+		bar := n.Value(baseKey).(map[string]widgetContents)
+
+		frameJSON := make(map[string]map[string]any)
+
+		for k, v := range bar {
+			if v.Data != nil { // fill the ones with actual data
+				var m map[string]any
+				yaml.Unmarshal(v.Data, &m)
+				frameJSON[k] = m
+			}
+		}
+
+		fmt.Printf("\n\n\n")
+		fmt.Println(frameJSON, "end")
+
+		b, _ := json.Marshal(frameJSON)
+		res, _ := os.Create("./testdata/frame_generate2/res.json")
+		res.Write(b)
+
+		Convey("Checking arguments are parsed correctly both in the create and generate section of json factories with the new method", t, func() {
+			Convey(fmt.Sprintf("Using frame %v ./testdata/sequnce.json as the input ", i), func() {
+				Convey("The generated widget map as a json body matches "+pv, func() {
+					So(expec.Sum(nil), ShouldResemble, got.Sum(nil))
+				})
+			})
+		})
 	}
 }

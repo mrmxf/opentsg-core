@@ -7,8 +7,8 @@
         "`swatchType` property is set by parent"
     ],
     "include": [
-        {"uri":"../create/canvas.json", "name":"canvas"},
-        {"uri":"pyramids.json", "name":"pd"}
+        {"uri":"../create/canvas.json", "name":"canvas", "args":["swatchType"]},
+        {"uri":"pyramids.json", "name":"pd", "args":["swatchType"]}
     ],
     "args":[
         {

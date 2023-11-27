@@ -78,12 +78,14 @@ func TestFactoryUpdates(t *testing.T) {
 
 func TestSubstitutions(t *testing.T) {
 	inputFile := "./testdata/frame_generate/substitution/sequence.json"
-	c, _, _ := FileImport(inputFile, "", false)
+	c, _, total := FileImport(inputFile, "", false)
+	fmt.Println(total)
 
 	predictedValues := []string{"./testdata/frame_generate/substitution/result_green.yaml"}
 
 	for i, pv := range predictedValues {
 		n, _ := FrameWidgetsGenerator(c, i, false)
+
 		expec, got := genHash(n, pv)
 
 		Convey("Checking arguments are parsed as alias names", t, func() {

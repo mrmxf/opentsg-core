@@ -1,6 +1,6 @@
 {
     "include":[
-        {"uri": "lots_path.json", "name":"frame"}
+        {"uri": "lots_path.json", "name":"frame", "args":["swatchType"]}
     ],
     "create":[
         {"frame": {"swatchType":"blue"}},

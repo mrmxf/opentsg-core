@@ -30,8 +30,6 @@ linters:
     - golint
 
 
-
-
 linters-settings:
 ##which complexity would I like?
   gocognit:

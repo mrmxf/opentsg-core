@@ -11,11 +11,7 @@
       { "uri": "../pyramid-data-new.json", "name": "d" }
     ],
     "args": [
-      {
-        "name": "swatchParams",
-        "type": "string",
-        "doc": "string index of imported swatch"
-      },
+     
       {
         "name": "frameNumber",
         "type": "number",
@@ -31,11 +27,11 @@
           "ranges": ["full", 8 ,"half"],
           "action": {
            "pyramid" : {
-           "d.{{swatchParams}}": ["grid.location","backgroundcolor"]}
+           "d.{{swatchType}}": ["grid.location","backgroundcolor"]}
           },
           "action old": {
             "pyramid" : {
-            "d.{{swatchParams}}R{{R}}.C{{C}}.B{{B}}": ["grid.location","backgroundcolor"]}
+            "d.{{swatchType}}R{{R}}.C{{C}}.B{{B}}": ["grid.location","backgroundcolor"]}
            }
       }
     ]

@@ -7,9 +7,9 @@
         "`swatchType` property is set by parent"
     ],
     "include": [
-        {"uri":"canvasblue.json", "name":"blue"},
-        {"uri":"canvasgreen.json", "name":"green"},
-        {"uri":"swatch.json", "name":"swatch"}
+        {"uri":"canvasblue.json", "name":"blue", "args":["swatchType"]},
+        {"uri":"canvasgreen.json", "name":"green", "args":["swatchType"]},
+        {"uri":"swatch.json", "name":"swatch", "args":["swatchType"]}
     ],
     "args":[
         {
@@ -20,8 +20,8 @@
     ],
     "create":[
         {
-            "{{swatchType}}":{},
-            "swatch":{"swatchParams": "{{swatchType}}"}
+            "green":{},
+            "swatch":{}
         }
     ]
 }

@@ -119,6 +119,9 @@
 			"$ref": "#/$defs/anycolour",
 			"description": "The colour for the lines of the testcard"
 		},
+		"ColorSpace" : {
+			"type" : "object"
+		},
 		"frame analytics": {
 			"type": "object",
 			"properties": {

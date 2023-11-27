@@ -10,7 +10,7 @@ import (
 
 	"github.com/cbroglie/mustache"
 	gonanoid "github.com/matoous/go-nanoid"
-	"github.com/mrmxf/opentsg-core/config/internal/get"
+	"github.com/mmTristan/opentsg-core/config/internal/get"
 	"github.com/peterbourgon/mergemap"
 	"gopkg.in/yaml.v3"
 )
@@ -27,6 +27,13 @@ type data struct {
 
 // FrameWidgetsGenerator runs the create frame for the given position. Applying any updates required and generating any
 // extra json from data. It returns an initial context with all the frame and configuration information.
+/*
+The widgets are found by depth first tree traversal, where properties are passed by property and not value.
+
+This means each include statement is searched when it is found and the order widgets
+are declared in this format, is the order they are run.
+
+*/
 func FrameWidgetsGenerator(c context.Context, pos int, debug bool) (context.Context, []error) {
 	var allError []error
 
@@ -40,7 +47,9 @@ func FrameWidgetsGenerator(c context.Context, pos int, debug bool) (context.Cont
 	// create a clean map for each frame to prevent overwrite errors. Line holder is only to be read from
 	bases := base{importedFactories: make(map[string]factory),
 		importedWidgets: make(map[string]json.RawMessage),
-		jsonFileLines:   mainBase.jsonFileLines}
+		jsonFileLines:   mainBase.jsonFileLines,
+		metadataParams:  mainBase.metadataParams,
+		metadataBucket:  make(map[string]map[string]any)}
 	for k, v := range mainBase.importedFactories {
 		bases.importedFactories[k] = v
 	}
@@ -61,6 +70,7 @@ func FrameWidgetsGenerator(c context.Context, pos int, debug bool) (context.Cont
 
 	// update the array paths
 	for _, delayUpdate := range delayUpdates {
+
 		parent := regexp.MustCompile(`^[\w\.]{1,255}(\[[\d]{1,3}:{0,1}[\d]{0,3}\]){1,}$`)
 		var updates []string
 		var err error
@@ -87,6 +97,8 @@ func FrameWidgetsGenerator(c context.Context, pos int, debug bool) (context.Cont
 			}
 		}
 	}
+
+	// fmt.Println(bases.metadataBucket)
 
 	parentsOfWidgetsMap := SyncMap{make(map[string]string), &sync.Mutex{}}
 	// addedWidgets holds all the widgets that are assigned a widget so missed ones can be found
@@ -154,8 +166,10 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 		childFactory, ok := b.importedFactories[dotPath]
 
 		if !ok {
+
 			// check if the updates are in a predeclared widget or an array/dotpath update
 			update, err := b.widgetHandler(createUpdate, dotPath, dotExt, positions, creatCount, zPos)
+
 			arrayUpdates = append(arrayUpdates, update...)
 
 			if err != nil {
@@ -163,37 +177,111 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 			}
 
 		} else { // run the factory
-			args := childFactory.getArgs()
-			metadata := make(map[string]any)
-			additions := make(map[string]any)
-			// newChild is the generated creates to passed along
 
-			// split the data into additions and metadata.
-			// metadata is used to update everything within the child
-			for k, v := range createUpdate {
-				if stringMatcher(k, args) {
-					metadata[k] = v
-				} else { // if it doesn't match then it is an addition
-					additions[k] = v
-				}
+			fullname := parent + runKey
+
+			if dotExt != "" {
+
+				fullname += "." + dotExt
 			}
 
+			//args := childFactory.getArgs()
+
+			metadata2 := make(map[string]any)
+
+			//	parents := strings.Split(fullname, ".")
+			//var base string
+
+			/*
+				use run key to argument paramters
+
+				at the moment this takes the arguments and applies them to any thing that may be passed on.
+				whereas the level its decalred should be edited?
+			*/
+			//	fmt.Println(b.metadataParams, "PARENT", parent, "run", parent+runKey, b.metadataParams[parent+runKey], dotExt)
+			//	fmt.Println(createUpdate)
+
+			/*
+				newArgs := b.metadataParams[fullname]
+				for i, p := range parents {
+					//fmt.Println(p)
+					if i != 0 {
+						base += "." + p
+					} else {
+						base = p
+					}
+
+					// only update with the metadata from the bucket
+					// and with metadata that fits the arguments
+					for k, v := range b.metadataBucket[base] {
+						if stringMatcher(k, newArgs) {
+							metadata2[k] = v
+						}
+					}
+
+					// mapOverWriter(metadata2, b.metadataBucket[base])
+
+				}
+
+				//	args2 = append(args2, b.metadataParams[parent+runKey]...)
+				// switch between the methods
+				if len(newArgs) > 0 {
+					args = newArgs
+				}
+
+				// metadata bucket can be run here
+				// can give parents and overwriting here
+
+
+				additions := make(map[string]any)
+				// newChild is the generated creates to passed along
+				// split the data into additions and metadata.
+				// metadata is used to update everything within the child
+				for k, v := range createUpdate {
+					if stringMatcher(k, args) {
+						metadata[k] = v
+					} else { // if it doesn't match then it is an addition
+						additions[k] = v
+					}
+				}*/
+
+			metadata, additions := b.metadataGetter(createUpdate, fullname)
+
+			//	fmt.Println(args, newArgs, fullname)
+			//	fmt.Println(metadata, additions, metadata2)
+			// assign the metadata before additional metadata is used
+
+			// b.metadataBucket[fullname] = metadata
+
+			mapOverWriter(metadata2, metadata)
+			metadata = metadata2
+
+			//		fmt.Println(b.metadataBucket, metadata2, base, "metadata")
+			// fmt.Println(b.metadataBucket, runKey, parents, dotExt, "md", dotPath)
+
 			newChild, err := getChildren(childFactory, dotPath, dotExt, additions, metadata)
-			if err != nil {
+			//	fmt.Println("CHILDREN:", newChild, additions, metadata, childFactory)
+			if err != nil { // quit this run after finding the errors
 				genErrs = append(genErrs, err)
 
 				continue
 			}
 
+			// fmt.Println(newChild)
+
 			// run the generate first if there is any
 			// do not run if the dot path is targeting its children
+			// as the children are updated afterwards
 			if len(childFactory.Generate) > 0 && dotExt == "" {
+
+				//	fmt.Println(b.metadataBucket)
 				errs := b.factoryGenerateWidgets(childFactory.Generate, dotPath+".", metadata, append(positions, creatCount), zPos)
 				genErrs = append(genErrs, errs...)
 			}
 
 			// then run any other creates
 			for i, r := range newChild {
+
 				// run the other creates to pass on their arguments
 				errs, arrs := b.createWidgets(r, dotPath+".", append(positions, []int{creatCount}...), i, zPos)
 				arrayUpdates = append(arrayUpdates, arrs...)
@@ -206,10 +294,81 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 	return genErrs, arrayUpdates
 }
 
+func (b *base) metadataGetter(update map[string]any, fullname string) (metadata, updaters map[string]any) {
+
+	metadata = make(map[string]any)
+	updaters = make(map[string]any)
+
+	parents := strings.Split(fullname, ".")
+	var base string
+
+	newArgs := b.metadataParams[fullname]
+	for i, p := range parents {
+		//fmt.Println(p)
+		if i != 0 {
+			base += "." + p
+		} else {
+			base = p
+		}
+
+		// only update with the metadata from the bucket
+		// and with metadata that fits the arguments
+		for k, v := range b.metadataBucket[base] {
+			if stringMatcher(k, newArgs) {
+				metadata[k] = v
+			}
+		}
+	}
+
+	// mapOverWriter(metadata2, b.metadataBucket[base])
+
+	//	additions := make(map[string]any)
+	// newChild is the generated creates to passed along
+
+	layerMetadata := make(map[string]any)
+	// split the data into additions and metadata.
+	// metadata is used to update everything within the child
+	for k, v := range update {
+		if stringMatcher(k, newArgs) {
+			metadata[k] = v
+			layerMetadata[k] = v
+		} else { // if it doesn't match then it is an addition
+			updaters[k] = v
+		}
+	}
+	//	fmt.Println(args, newArgs, fullname)
+	//	fmt.Println(metadata, additions, metadata2)
+	// assign the metadata before additional metadata is used
+
+	// only assign the metadata if it is the first pass and a base widget
+
+	if _, ok := b.metadataBucket[fullname]; !ok {
+
+		// set the base as empty if there is no
+		b.metadataBucket[fullname] = layerMetadata
+
+	}
+
+	/*	fmt.Println(fullname, b.metadataBucket, "BEFORE")
+		b.metadataBucket[fullname] = metadata
+		fmt.Println(fullname, b.metadataBucket, "AFTER")*/
+	// b.metadataBucket[fullname] = metadata
+
+	return
+}
+
+func mapOverWriter[C comparable, T any](dest, new map[C]T) {
+
+	for k, v := range new {
+		dest[k] = v
+	}
+}
+
 // getChildren extracts the children of a factory. If it contains a dotpath extension then the child is just the single
 // object of that addition.
 func getChildren(childFactory factory, dotPath, dotExt string, additions, metadata map[string]any) ([]map[string]map[string]any, error) {
 	var newChild []map[string]map[string]any
+
 	if dotExt != "" {
 		// apply the metadata and mock the create function for passing data on
 		newChild = make([]map[string]map[string]any, 1)
@@ -219,17 +378,33 @@ func getChildren(childFactory factory, dotPath, dotExt string, additions, metada
 		}
 		//	newChild[0] = map[string]map[string]any{dotExt: createUpdate}
 		newChild[0] = map[string]map[string]any{dotExt: updated}
+		//newChild[0] = map[string]map[string]any{dotExt: additions}
 	} else {
-
+		//this is where the problems happen
+		// as the child takes the metadata from the parent instead of forming its won
+		// @ TODO
 		newChild = make([]map[string]map[string]any, len(childFactory.Create))
 		for i, action := range childFactory.Create {
 			// update the map for each create function with
 			// the separated metadata and map aditions
-			var err error
-			newChild[i], err = mapMustacheUpdater(action, metadata, additions, dotPath, dotExt)
-			if err != nil {
-				return newChild, err
+
+			newAction := make(map[string]map[string]any)
+
+			for k, v := range action {
+				subAction := make(map[string]any)
+				mergemap.Merge(subAction, v)
+				mergemap.Merge(subAction, additions)
+
+				newAction[k] = subAction
 			}
+
+			newChild[i] = newAction
+
+			//	var err error
+			/*	newChild[i], err = mapMustacheUpdater(action, metadata, additions, dotPath, dotExt)
+				if err != nil {
+					return newChild, err
+				}*/
 		}
 	}
 
@@ -248,10 +423,22 @@ func (b *base) widgetHandler(createUpdate map[string]any, dotPath, dotExt string
 		}
 
 		return []jsonUpdate{{dotPath, createUpdate}}, nil
-
 	}
 
-	err := b.frameBytesAdder(createUpdate, widgBase, dotPath, append(positions, createCount), zPos)
+	//update createUpdate here
+
+	// @ ADDED
+
+	md, ud := b.metadataGetter(createUpdate, dotPath)
+	res, err := objectMustacheUpdater(ud, md, dotPath, dotExt, "")
+
+	if err != nil {
+		return []jsonUpdate{}, err
+	}
+
+	err = b.frameBytesAdder(res, widgBase, dotPath, append(positions, createCount), zPos)
+
+	// fmt.Println(string(widgBase), ok)
 	if err != nil {
 		return []jsonUpdate{}, fmt.Errorf("0009 %v when parsing the widget %s", err, dotPath)
 	}
@@ -351,6 +538,7 @@ func mapMustacheUpdater(baseCreate map[string]map[string]any, metadata, updates 
 
 	for targetWidg, baseUpdate := range baseCreate {
 		// update the target widget with the metadata here. The metadata is self contained per child
+		//@ Added removed the metadata bots
 		target, err := mustacheErrorWrap(targetWidg, path+ext, metadata)
 		if err != nil {
 
@@ -504,7 +692,7 @@ func (b *base) generateAction(genName []map[string]string, action, targetName, p
 	// get the data then add all the dimensions
 	toAdd := make(map[string]data)
 
-	// TODO push it through with the schema so we know the error doesn't need checking.
+	// @TODO push it through with the schema so we know the error doesn't need checking.
 	if err := yaml.Unmarshal(updateData, &toAdd); err != nil {
 		return []error{fmt.Errorf("0033 extracting data for %s : ", parent+targetName)}
 	}
@@ -535,6 +723,16 @@ func (b *base) generateAction(genName []map[string]string, action, targetName, p
 
 	if err != nil {
 		return []error{fmt.Errorf("0014 %v at %s", err, aliasError)}
+	}
+
+	args := b.metadataParams[parent[:len(parent)-1]]
+	// assign the argument of the parent to the generate widgets
+	// so any metadata updates can still be applied
+	for _, keys := range results {
+		b.metadataParams[parent+keys.name[1:]] = args
+		// figure out metadata declaration. BEcause the metadata may be comprised of
+		// several layers
+		b.metadataBucket[parent+keys.name[1:]] = meta
 	}
 
 	genErrs := b.dataToFrame(jsonBase, results, data, updateFields, parent, aPositions, zPos)
@@ -703,7 +901,8 @@ func (r *recurseData) recurseDataArray(arrayPos int) {
 				arrayPosition += (r.positions[n.key]) * r.offsets[j]
 				pos[j] = r.positions[n.key]
 			}
-			// no error handling here as the keys are made here
+			// no error handling here as the keys are made within the function
+			// so they never are missed out
 			st, _ := mustache.Render(r.key, r.positions)
 			r.results = append(r.results, arrayValues{st, arrayPosition, pos})
 		}
@@ -1010,7 +1209,10 @@ func tree(bases map[string]widgetContents) {
 }
 
 func mustacheErrorWrap(input, location string, metadata map[string]any) (string, error) {
+	// ensure we don't allow missing varaibles
+	mustache.AllowMissingVariables = false
 	sUp, err := mustache.Render(input, metadata)
+
 	if err != nil {
 		/*
 			what information is useful here
