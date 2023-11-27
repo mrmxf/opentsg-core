@@ -43,9 +43,6 @@ var imageType = canvaswidget.GetCanvasType
 
 // Colours
 var getFill = canvaswidget.GetFillColour
-
-// Colours
-var getFill = canvaswidget.GetFillColour
 var colourSpaceType = canvaswidget.GetBaseColourSpace
 
 type canvasAndMask struct {
@@ -174,6 +171,7 @@ func gridGen(c *context.Context, geomCanvas canvasAndMask) (draw.Image, error) {
 		}
 		x += squareX
 	}
+
 	// if there is a global mask apply it
 	if (geomCanvas != canvasAndMask{}) {
 		base := ImageGenerator(*c, canvas.Bounds())
