@@ -10,11 +10,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mrmxf/opentsg-core/canvaswidget"
-	"github.com/mrmxf/opentsg-core/config/core"
-	"github.com/mrmxf/opentsg-core/config/widgets"
-	errhandle "github.com/mrmxf/opentsg-core/errHandle"
-	"github.com/mrmxf/opentsg-core/gridgen"
+	"github.com/mmTristan/opentsg-core/canvaswidget"
+	"github.com/mmTristan/opentsg-core/colour"
+	"github.com/mmTristan/opentsg-core/config/core"
+	"github.com/mmTristan/opentsg-core/config/widgets"
+	errhandle "github.com/mmTristan/opentsg-core/errHandle"
+	"github.com/mmTristan/opentsg-core/gridgen"
 	"gopkg.in/yaml.v2"
 )
 
@@ -145,7 +146,7 @@ func WidgetRunner[T Generator](canvasChan chan draw.Image, g GenConf[T], c *cont
 				if generated {
 					// extract base from channel before readding and preventing race conditions
 					canvas := <-canvasChan
-					draw.DrawMask(canvas, gridcanvas.Bounds().Add(imgLocation), gridcanvas, image.Point{}, mask, image.Point{}, draw.Over)
+					colour.DrawMask(canvas, gridcanvas.Bounds().Add(imgLocation), gridcanvas, image.Point{}, mask, image.Point{}, draw.Over)
 					//draw.DrawMask(canvas, canvas.Bounds(), add.img, add.location, add.mask, add.location, draw.Over)
 					canvasChan <- canvas
 				}

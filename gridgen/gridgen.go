@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"image"
-	"image/color"
 	"image/draw"
 	"math"
 	"regexp"
@@ -13,10 +12,11 @@ import (
 	"strings"
 
 	"github.com/fogleman/gg"
-	"github.com/mrmxf/opentsg-core/aces"
-	"github.com/mrmxf/opentsg-core/canvaswidget"
-	"github.com/mrmxf/opentsg-core/colourgen"
-	"github.com/mrmxf/opentsg-core/config/core"
+	"github.com/mmTristan/opentsg-core/aces"
+	"github.com/mmTristan/opentsg-core/canvaswidget"
+	"github.com/mmTristan/opentsg-core/colour"
+	"github.com/mmTristan/opentsg-core/colourgen"
+	"github.com/mmTristan/opentsg-core/config/core"
 )
 
 type gridContextKey struct {
@@ -41,6 +41,10 @@ var getWidth = canvaswidget.GetLWidth
 var size = canvaswidget.GetPictureSize
 var imageType = canvaswidget.GetCanvasType
 
+// Colours
+var getFill = canvaswidget.GetFillColour
+var colourSpaceType = canvaswidget.GetBaseColourSpace
+
 type canvasAndMask struct {
 	canvas, mask draw.Image
 }
@@ -52,47 +56,55 @@ func baseGen(c *context.Context, geomCanvas draw.Image) (draw.Image, error) {
 		// based on type do this and use aces as increased fidelity?
 		canvasSize := image.Rect(0, 0, s.X, s.Y)
 
-		canvas = imageGenerator(*c, canvasSize)
+		canvas = ImageGenerator(*c, canvasSize)
 	} else {
 		canvas = geomCanvas
 	}
 
-	background := color.NRGBA64{R: 46080, G: 46080, B: 46080, A: 0xffff}
-	colour := canvaswidget.GetFillColour(*c)
-	if colour != "" { // check for user defined colours
-		col := colourgen.HexToColour(colour)
-		background = colourgen.ConvertNRGBA64(col)
+	background := &colour.CNRGBA64{R: 46080, G: 46080, B: 46080, A: 0xffff}
+	fillColour := getFill(*c)
+	if fillColour != "" { // check for user defined colours
+		background = colourgen.HexToColour(fillColour, colourSpaceType(*c))
+		// background = colourgen.ConvertNRGBA64(col)
 	}
 
-	draw.Draw(canvas, canvas.Bounds(), &image.Uniform{background}, image.Point{}, draw.Src)
+	colour.Draw(canvas, canvas.Bounds(), &image.Uniform{background}, image.Point{}, draw.Src)
 	// make the squares sizes
 	x := cols(*c)
 	y := rows(*c)
 	if x == 0 || y == 0 {
 		return canvas, fmt.Errorf("0041 No columns or rows declared, got %v rows and %v columns", y, x)
 	}
+	// @TODO make these scale, not be whole numbers
 	// make sure the number is a whole number etc
-	squareX := canvas.Bounds().Max.X / x
-	squareY := canvas.Bounds().Max.Y / y
+	squareX := float64(canvas.Bounds().Max.X) / float64(x)
+	squareY := float64(canvas.Bounds().Max.Y) / float64(y)
 	gridToScale(x) // Tell the user the valid list of coordinates, not used anymore
 	cmid := context.WithValue(*c, xkey, squareX)
 	cmid = context.WithValue(cmid, ykey, squareY)
 	cmid = context.WithValue(cmid, sizekey, canvas.Bounds().Max)
 	*c = cmid
 
-	splice(c, squareX, squareY, canvas.Bounds().Max)
+	splice(c, x, y, squareX, squareY)
 
 	return canvas, nil
 }
 
-func imageGenerator(c context.Context, canvasSize image.Rectangle) draw.Image {
+func ImageGenerator(c context.Context, canvasSize image.Rectangle) draw.Image {
 	base := imageType(c)
 	if base == "ACES" {
 
 		return aces.NewARGBA(canvasSize)
 	}
 
-	return image.NewNRGBA64(canvasSize)
+	space := colourSpaceType(c)
+	switch space {
+	case colour.ColorSpace{}:
+		// if there's no colour space jsut use the base go images for performance
+		return image.NewNRGBA64(canvasSize)
+	default:
+		return colour.NewNRGBA64(space, canvasSize)
+	}
 
 }
 
@@ -132,22 +144,38 @@ func gridGen(c *context.Context, geomCanvas canvasAndMask) (draw.Image, error) {
 	if err != nil {
 		return canvas, err
 	}
-	squareX := (*c).Value(xkey).(int)
-	squareY := (*c).Value(ykey).(int)
+
+	squareX := (*c).Value(xkey).(float64)
+	squareY := (*c).Value(ykey).(float64)
 	// make a grid frame for each generated module
 	width := getWidth(*c)
-	gImage := maskGen(squareX, squareY, width, c)
+	// gImage := maskGen(squareX, squareY, width, c)
+	squares := make(map[image.Point]image.Image)
 
 	// make the squares
-	for a := 0; a < canvas.Bounds().Max.X; a += squareX {
-		for b := 0; b < canvas.Bounds().Max.Y; b += squareY {
-			draw.Draw(canvas, image.Rect(a, b, a+squareX, b+squareY), gImage, image.Point{}, draw.Over)
+	x := 0.0
+
+	for x < float64(canvas.Bounds().Max.X) {
+		y := 0.0
+		for y < float64(canvas.Bounds().Max.Y) {
+
+			size := image.Point{X: int(x+squareX) - int(x), Y: int(y+squareY) - int(y)}
+			gImage, ok := squares[size]
+			if !ok {
+				gImage = maskGen(size.X, size.Y, width, c)
+				squares[size] = gImage
+			}
+
+			colour.Draw(canvas, image.Rect(int(x), int(y), int(x+squareX), int(y+squareY)), gImage, image.Point{}, draw.Over)
+			y += squareY
 		}
+		x += squareX
 	}
+
 	// if there is a global mask apply it
 	if (geomCanvas != canvasAndMask{}) {
-		base := imageGenerator(*c, canvas.Bounds())
-		draw.DrawMask(base, base.Bounds(), geomCanvas.canvas, image.Point{}, geomCanvas.mask, image.Point{}, draw.Src)
+		base := ImageGenerator(*c, canvas.Bounds())
+		colour.DrawMask(base, base.Bounds(), geomCanvas.canvas, image.Point{}, geomCanvas.mask, image.Point{}, draw.Src)
 
 		return base, nil
 	}
@@ -160,11 +188,11 @@ func maskGen(maxX, maxY int, width float64, c *context.Context) image.Image {
 	maskTailor := image.NewNRGBA64(image.Rect(0, 0, maxX, maxY))
 	// this is automaticall changed to rgb
 	cd := gg.NewContextForImage(maskTailor)
-	myBorder := color.NRGBA64{0, 0, 0, 0xffff}
+	myBorder := &colour.CNRGBA64{R: 0, G: 0, B: 0, A: 0xffff}
 	colour := canvaswidget.GetLineColour(*c)
 	if colour != "" { // check for user defined colours
-		col := colourgen.HexToColour(colour)
-		myBorder = colourgen.ConvertNRGBA64(col)
+		myBorder = colourgen.HexToColour(colour, colourSpaceType(*c))
+		// myBorder = colourgen.ConvertNRGBA64(col)
 	}
 
 	cd.SetColor(myBorder)
@@ -250,8 +278,16 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 	regRC := regexp.MustCompile(`^[Rr]([\d]{2,}|[1-9]{1})[Cc]([\d]{2,}|[1-9]{1})$`)
 	regRCArea := regexp.MustCompile(`^[Rr]([\d]{2,}|[1-9]{1})[Cc]([\d]{2,}|[1-9]{1}):[Rr]([\d]{2,}|[1-9]{1})[Cc]([\d]{2,}|[1-9]{1})$`)
 
-	squareX := (*c).Value(xkey).(int)
-	squareY := (*c).Value(ykey).(int)
+	squareX := (*c).Value(xkey).(float64)
+	squareY := (*c).Value(ykey).(float64)
+
+	// @TODO insert an offset function here
+	/*
+		this needs to contain the offset in pre canvas sizes as it could lead to slight offsets
+		needs to be in raw coordinates and added to the multiplication. Because of
+		the rounding nature of finding the coordinates. Then can apply offset even if its 0 to all
+		calculations
+	*/
 
 	aliasMap := core.GetAlias(*c)
 	// TODO clean the switch statement by making everything a function of grid
@@ -263,10 +299,11 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 			return emptyGrid, err
 		}
 		// get square locations
-		generatedGridInfo.X = x * squareX
-		generatedGridInfo.Y = y * squareY
+		generatedGridInfo.X = int(float64(x) * squareX)
+		generatedGridInfo.Y = int(float64(y) * squareY)
 		// make a 1x1 square
-		generatedGridInfo.w, generatedGridInfo.h = squareX, squareY
+		generatedGridInfo.w, generatedGridInfo.h = int(float64(x+1)*squareX)-generatedGridInfo.X, int(float64(y+1)*squareY)-generatedGridInfo.Y
+
 		// g.GImage = image.NewNRGBA64(image.Rect(0, 0, squareX, squareY))
 	case regArea.MatchString(gridString):
 		// gridSplit(gridString) //split it around :
@@ -282,15 +319,16 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 			return emptyGrid, err
 		}
 
-		generatedGridInfo.X = x * squareX
-		generatedGridInfo.Y = y * squareY
+		generatedGridInfo.X = int(float64(x) * squareX)
+		generatedGridInfo.Y = int(float64(y) * squareY)
 		// make sure the coordinates are in a valid direction
 		if xend < x || yend < y {
 
 			return emptyGrid, fmt.Errorf(invalidCoordinates, gridString, x, y, xend, yend)
 
 		}
-		generatedGridInfo.w, generatedGridInfo.h = squareX*(xend-x+1), squareY*(yend-y+1)
+		generatedGridInfo.w, generatedGridInfo.h = int(float64(xend+1)*squareX)-generatedGridInfo.X, int(float64(yend+1)*squareY)-generatedGridInfo.Y
+
 		// g.GImage = image.NewNRGBA64(image.Rect(0, 0, squareX*(xend-x+1), squareY*(yend-y+1)))
 	case regXY.MatchString(gridString):
 		// remove surronding brackets and replace
@@ -314,15 +352,16 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 		generatedGridInfo.Y = y
 
 		generatedGridInfo.w, generatedGridInfo.h = xend-x, yend-y
+
 	case regRC.MatchString(gridString):
 		gridString = strings.ToUpper(gridString)
 		x, y := 0, 0
 		fmt.Sscanf(gridString, "R%dC%d", &x, &y)
 		// get square locations
-		generatedGridInfo.X = (x - 1) * squareX
-		generatedGridInfo.Y = (y - 1) * squareY
+		generatedGridInfo.X = int(float64(x-1) * squareX)
+		generatedGridInfo.Y = int(float64(y-1) * squareY)
 		// make a 1x1 square
-		generatedGridInfo.w, generatedGridInfo.h = squareX, squareY
+		generatedGridInfo.w, generatedGridInfo.h = int(float64(x)*squareX)-generatedGridInfo.X, int(float64(y)*squareY)-generatedGridInfo.Y
 
 	case regRCArea.MatchString(gridString):
 
@@ -335,10 +374,12 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 			return emptyGrid, fmt.Errorf(invalidCoordinates, gridString, xs, ys, xe, ye)
 		}
 		// get square locations
-		generatedGridInfo.X = (xs - 1) * squareX
-		generatedGridInfo.Y = (ys - 1) * squareY
+		generatedGridInfo.X = int(float64(xs-1) * squareX)
+		generatedGridInfo.Y = int(float64(ys-1) * squareY)
 		// make a 1x1 square
-		generatedGridInfo.w, generatedGridInfo.h = squareX*(xe-xs), squareY*(ye-ys)
+		generatedGridInfo.w, generatedGridInfo.h = int(float64(xe-1)*squareX)-generatedGridInfo.X, int(float64(ye-1)*squareY)-generatedGridInfo.Y
+
+		//squareX*(xe-xs), squareY*(ye-ys)
 	case regAlias.MatchString(gridString):
 		loc := aliasMap.Data[gridString]
 		if loc != "" {
@@ -354,14 +395,15 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 
 		return generatedGridInfo, fmt.Errorf(invalidGrid, gridString)
 	}
+
 	// generate the image based on the user input to ensure continuity
-	generatedGridInfo.GImage = imageGenerator(*c, image.Rect(0, 0, generatedGridInfo.w, generatedGridInfo.h))
+	generatedGridInfo.GImage = ImageGenerator(*c, image.Rect(0, 0, generatedGridInfo.w, generatedGridInfo.h))
 
 	mask := (*c).Value(tilemaskkey)
 	if mask != nil {
 		mask := mask.(draw.Image)
-		maskdest := imageGenerator(*c, image.Rect(0, 0, generatedGridInfo.w, generatedGridInfo.h))
-		draw.Draw(maskdest, maskdest.Bounds(), mask, image.Point{generatedGridInfo.X, generatedGridInfo.Y}, draw.Src)
+		maskdest := ImageGenerator(*c, image.Rect(0, 0, generatedGridInfo.w, generatedGridInfo.h))
+		colour.Draw(maskdest, maskdest.Bounds(), mask, image.Point{generatedGridInfo.X, generatedGridInfo.Y}, draw.Src)
 		generatedGridInfo.GMask = maskdest
 	}
 

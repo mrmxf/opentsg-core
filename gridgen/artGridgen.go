@@ -11,7 +11,8 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/mrmxf/opentsg-core/config/core"
+	"github.com/mmTristan/opentsg-core/colour"
+	"github.com/mmTristan/opentsg-core/config/core"
 	"github.com/nfnt/resize"
 	"golang.org/x/image/tiff"
 )
@@ -31,7 +32,7 @@ func artKeyGen(c *context.Context, geomCanvas draw.Image, base string) (draw.Ima
 	}
 
 	// add the image and then extract the locations
-	draw.Draw(canvas, canvas.Bounds(), baseImg, image.Point{}, draw.Src)
+	colour.Draw(canvas, canvas.Bounds(), baseImg, image.Point{}, draw.Src)
 	keys, err := imageToKeyMap(baseImg, c)
 	if err != nil {
 		return canvas, err
@@ -100,7 +101,7 @@ func extract(b []byte, fname string, bounds image.Point) (i *image.NRGBA64, e er
 		midI = resize.Resize(uint(bounds.X), uint(bounds.Y), midI, resize.Bicubic)
 	}
 	i = image.NewNRGBA64(midI.Bounds())
-	draw.Draw(i, i.Bounds(), midI, image.Point{}, draw.Src)
+	colour.Draw(i, i.Bounds(), midI, image.Point{}, draw.Src)
 	if e != nil {
 		e = fmt.Errorf("0042 error opening background image %v", e)
 	}
@@ -148,8 +149,8 @@ func imageToKeyMap(toScan *image.NRGBA64, c *context.Context) (map[string]artGri
 
 		// add 1 to include the full range of the image
 		// update this to be generic for the different image types
-		result := imageGenerator(*c, image.Rect(0, 0, maxX-minX+1, maxY-minY+1))
-		mask := imageGenerator(*c, image.Rect(0, 0, maxX-minX+1, maxY-minY+1))
+		result := ImageGenerator(*c, image.Rect(0, 0, maxX-minX+1, maxY-minY+1))
+		mask := ImageGenerator(*c, image.Rect(0, 0, maxX-minX+1, maxY-minY+1))
 
 		// find the rgba value of the key
 		r, g, b, a := visitKey(scanPix, image.Point{minX + int(float64(maxX-minX)/2.0), minY + int(float64(maxY-minY)/2.0)}, scanBounds, target)

@@ -7,8 +7,8 @@
         "`swatchType` property is set by parent"
     ],
     "include": [
-        {"uri":"canvas.json", "name":"canvas"},
-        {"uri":"swatch_generate_repeat.json", "name":"swatch"}
+        {"uri":"canvas.json", "name":"canvas", "args":["swatchType"]},
+        {"uri":"swatch_generate_repeat.json", "name":"swatch", "args":["swatchType"]}
     ],
     "args":[
         {
@@ -20,7 +20,7 @@
     "create":[
         {
             "canvas":{"linewidth": 0.5,"name":["000-{{swatchType}}-{{framenumber}}.json"]}},{
-            "swatch":{"swatchParams": "{{swatchType}}"}
+            "swatch":{}
         }
     ]
 }

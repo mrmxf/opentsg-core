@@ -7,20 +7,18 @@ documentation:
   - "`swatchType` property is set by parent"
     
 include:
-  - uri: canvas.yaml
+  - uri: ./canvas.yaml
     name: canvas
-  - uri: ../swatch.json
+    args: 
+      - swatchType
+  - uri: ./swatch.yaml
     name: swatch
-
-args:        
-- name: swatchType
-  type: string
-  doc: "just a string for substitution in lower levels"
+    args: 
+      - swatchType
 create:
 - canvas:
     linewidth: 0.5
     name:
     - 000-{{swatchType}}-{{framenumber}}.json
 - swatch:
-    swatchParams: "{{swatchType}}"
 

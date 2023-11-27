@@ -13,11 +13,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mrmxf/opentsg-core/canvaswidget"
-	"github.com/mrmxf/opentsg-core/colourgen"
-	"github.com/mrmxf/opentsg-core/config/core"
-	errhandle "github.com/mrmxf/opentsg-core/errHandle"
-	"github.com/mrmxf/opentsg-core/gridgen"
+	"github.com/mmTristan/opentsg-core/canvaswidget"
+	"github.com/mmTristan/opentsg-core/colour"
+	"github.com/mmTristan/opentsg-core/colourgen"
+	"github.com/mmTristan/opentsg-core/config/core"
+	errhandle "github.com/mmTristan/opentsg-core/errHandle"
+	"github.com/mmTristan/opentsg-core/gridgen"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -110,15 +111,15 @@ func TestWidgetRun(t *testing.T) {
 
 	// assign the colour to the correct type of image NGRBA64 and replace the colour values
 	readImage := image.NewNRGBA64(baseVals.Bounds())
-	draw.Draw(readImage, readImage.Bounds(), baseVals, image.Point{}, draw.Src)
+	colour.Draw(readImage, readImage.Bounds(), baseVals, image.Point{}, draw.Src)
 
 	hnormal := sha256.New()
 	htest := sha256.New()
 	hnormal.Write(readImage.Pix)
-	htest.Write(canvas.(*image.NRGBA64).Pix)
+	htest.Write(canvas.(*colour.NRGBA64).Pix())
 
-	//td, _ := os.Create("r.png")
-	//png.Encode(td, canvas)
+	// td, _ := os.Create("r.png")
+	// png.Encode(td, canvas)
 
 	Convey("Checking that generator runs for a single function with a map of 4 colours", t, func() {
 		Convey("Run using ./collater.json for the image widgets", func() {
@@ -169,14 +170,14 @@ func TestZposRun(t *testing.T) {
 
 		// assign the colour to the correct type of image NGRBA64 and replace the colour values
 		readImage := image.NewNRGBA64(baseVals.Bounds())
-		draw.Draw(readImage, readImage.Bounds(), baseVals, image.Point{}, draw.Src)
+		colour.Draw(readImage, readImage.Bounds(), baseVals, image.Point{}, draw.Src)
 
 		hnormal := sha256.New()
 		htest := sha256.New()
 		hnormal.Write(readImage.Pix)
-		htest.Write(canvas.(*image.NRGBA64).Pix)
+		htest.Write(canvas.(*colour.NRGBA64).Pix())
 
-		// td, _ := os.Create("r.png")
+		// td, _ := os.Create(ftarget + "r.png")
 		// png.Encode(td, canvas)
 
 		Convey("Checking that generator runs for the zOrder across two functions", t, func() {
@@ -233,14 +234,14 @@ func TestErrorZpos(t *testing.T) {
 
 		// assign the colour to the correct type of image NGRBA64 and replace the colour values
 		readImage := image.NewNRGBA64(baseVals.Bounds())
-		draw.Draw(readImage, readImage.Bounds(), baseVals, image.Point{}, draw.Src)
+		colour.Draw(readImage, readImage.Bounds(), baseVals, image.Point{}, draw.Src)
 
 		hnormal := sha256.New()
 		htest := sha256.New()
 		hnormal.Write(readImage.Pix)
-		htest.Write(canvas.(*image.NRGBA64).Pix)
+		htest.Write(canvas.(*colour.NRGBA64).Pix())
 
-		// td, _ := os.Create(fmt.Sprintf("%vr.png", i))
+		// td, _ := os.Create(fmt.Sprintf("%vr.png", ftarget))
 		// png.Encode(td, canvas)
 
 		Convey("Checking that generator runs in the zOrder when errors are emitted", t, func() {
@@ -262,9 +263,9 @@ type test struct {
 
 // Mock generator functions
 func (tt test) Generate(i draw.Image, t ...any) error {
-	c := colourgen.HexToColour(tt.Colour)
+	c := colourgen.HexToColour(tt.Colour, colour.ColorSpace{})
 	// fmt.Println(tt.Fill)
-	draw.Draw(i.(*image.NRGBA64), i.Bounds(), &image.Uniform{c}, image.Point{}, draw.Src)
+	colour.Draw(i.(*colour.NRGBA64), i.Bounds(), &image.Uniform{c}, image.Point{}, draw.Src)
 
 	return nil
 }
@@ -289,7 +290,7 @@ func (tt testhook) Generate(i draw.Image, t ...any) error {
 
 		return fmt.Errorf("%v", tt.Err)
 	}
-	draw.Draw(i, i.Bounds(), &image.Uniform{color.Black}, image.Point{}, draw.Src)
+	colour.Draw(i, i.Bounds(), &image.Uniform{color.Black}, image.Point{}, draw.Src)
 
 	return nil
 }

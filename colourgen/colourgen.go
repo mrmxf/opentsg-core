@@ -6,6 +6,8 @@ import (
 	"image/color"
 	"regexp"
 	"strings"
+
+	"github.com/mmTristan/opentsg-core/colour"
 )
 
 // AssignRGBValues takes a string and the rgb value and returns a [3]int array of the rgb values for a colour.
@@ -39,13 +41,14 @@ func AssignRGBValues(colour string, rgb, maxBlack, maxWhite int) ([3]int, error)
 }
 
 // HexToColour takes a string and returns a colour value, extracting the rgba values from the string. When no alpha channel
-// is found the alpha is set to be the max.
+// is found the alpha is set to be the max 16 bit value.
 //
 // Acceptable formats are #rgb, #rgba, #rrggbb, ##rrggbbaa, rgb(r,g,b), rgba(r,g,b,a), rgb12(r,g,b) and rgba12(r,g,b,a)
 //
 // The resulting value is either color.NRGBA or color.NRBGA64, 12 bit RGB values are represented in 16 bit NRGBA64.
-func HexToColour(colorCode string) color.Color {
-	var colour color.NRGBA
+// If the alpha channel is found and its the maximum value the maximum 16 bit value is used.
+func HexToColour(colorCode string, space colour.ColorSpace) *colour.CNRGBA64 {
+	var base *colour.CNRGBA64
 	regRRGGBB := regexp.MustCompile(`^#[A-Fa-f0-9]{6}$`)
 	regRGB := regexp.MustCompile(`^#[A-Fa-f0-9]{3}$`)
 	regRRGGBBAA := regexp.MustCompile(`^#[A-Fa-f0-9]{8}$`)
@@ -59,94 +62,112 @@ func HexToColour(colorCode string) color.Color {
 	// check length as all are unqiue>
 	switch {
 	case regRRGGBB.MatchString(colorCode):
-		
-		return rrggbb(colorCode, colour)
+
+		base = rrggbb(colorCode)
 	case regRGB.MatchString(colorCode):
 
-		return rgb(colorCode, colour)
+		base = rgb(colorCode)
 	case regRRGGBBAA.MatchString(colorCode):
 
-		return rrggbbaa(colorCode, colour)
+		base = rrggbbaa(colorCode)
 	case regRGBA.MatchString(colorCode):
 
-		return rgba(colorCode, colour)
+		base = rgba(colorCode)
 	case regcssRGBA.MatchString(colorCode):
 
-		return cssrgba(colorCode, colour)
+		base = cssrgba(colorCode)
 	case regcssRGB.MatchString(colorCode):
 
-		return cssrgb(colorCode, colour)
+		base = cssrgb(colorCode)
 	case regcssRGB12.MatchString(colorCode):
 
-		return cssrgb12(colorCode)
+		base = cssrgb12(colorCode)
 	case regcssRGBA12.MatchString(colorCode):
 
 		return cssrgba12(colorCode)
+	default:
+		base = &colour.CNRGBA64{}
 	}
 
-	return colour
+	base.ColorSpace = space
+	return base
 }
 
-func rrggbb(hex string, c color.NRGBA) color.NRGBA {
-	fmt.Sscanf(hex, "#%02x%02x%02x", &c.R, &c.G, &c.B)
-	c.A = 0xff
-	
-	return c
+func rrggbb(hex string) *colour.CNRGBA64 {
+	var R, G, B uint16
+	fmt.Sscanf(hex, "#%02x%02x%02x", &R, &G, &B)
+
+	return &colour.CNRGBA64{R: R << 8, G: G << 8, B: B << 8, A: 0xffff}
 }
 
-func rgb(hex string, c color.NRGBA) color.NRGBA {
-	fmt.Sscanf(hex, "#%01x%01x%01x", &c.R, &c.G, &c.B)
-	c.A = 0xff
-	c.R <<= 4
-	c.G <<= 4
-	c.B <<= 4
+func rgb(hex string) *colour.CNRGBA64 {
+	var R, G, B uint16
+	fmt.Sscanf(hex, "#%01x%01x%01x", &R, &G, &B)
 
-	return c
+	return &colour.CNRGBA64{R: R << 12, G: G << 12, B: B << 12, A: 0xffff}
 }
 
-func rrggbbaa(hex string, c color.NRGBA) color.NRGBA {
-	fmt.Sscanf(hex, "#%02x%02x%02x%02x", &c.R, &c.G, &c.B, &c.A)
+func rrggbbaa(hex string) *colour.CNRGBA64 {
+	var R, G, B, A uint16
+	fmt.Sscanf(hex, "#%02x%02x%02x%02x", &R, &G, &B, &A)
+	if A == 0xff {
+		A = 0xffff
+	} else {
+		A <<= 8
+	}
 
-	return c
+	return &colour.CNRGBA64{R: R << 8, G: G << 8, B: B << 8, A: A}
 }
 
-func rgba(hex string, c color.NRGBA) color.NRGBA {
-	fmt.Sscanf(hex, "#%01x%01x%01x%01x", &c.R, &c.G, &c.B, &c.A)
-	c.R <<= 4
-	c.G <<= 4
-	c.B <<= 4
-	c.A <<= 4
+func rgba(hex string) *colour.CNRGBA64 {
+	var R, G, B, A uint16
+	fmt.Sscanf(hex, "#%01x%01x%01x%01x", &R, &G, &B, &A)
 
-	return c
+	if A == 0xf {
+		A = 0xffff
+	} else {
+		A <<= 12
+	}
+
+	return &colour.CNRGBA64{R: R << 12, G: G << 12, B: B << 12, A: A}
 }
 
-func cssrgba(css string, c color.NRGBA) color.NRGBA {
-	fmt.Sscanf(css, "rgba(%v,%v,%v,%v)", &c.R, &c.G, &c.B, &c.A)
+func cssrgba(css string) *colour.CNRGBA64 {
+	var R, G, B, A uint16
+	fmt.Sscanf(css, "rgba(%v,%v,%v,%v)", &R, &G, &B, &A)
+	if A == 0xff {
+		A = 0xffff
+	} else {
+		A <<= 8
+	}
 
-	return c
+	return &colour.CNRGBA64{R: R << 8, G: G << 8, B: B << 8, A: A}
 }
 
-func cssrgb(css string, c color.NRGBA) color.NRGBA {
-	fmt.Sscanf(css, "rgb(%v,%v,%v)", &c.R, &c.G, &c.B)
-	c.A = 0xff
+func cssrgb(css string) *colour.CNRGBA64 {
+	var R, G, B uint16
+	fmt.Sscanf(css, "rgb(%v,%v,%v)", &R, &G, &B)
 
-	return c
+	return &colour.CNRGBA64{R: R << 8, G: G << 8, B: B << 8, A: 0xffff}
 }
 
-func cssrgb12(css string) color.NRGBA64 {
-	R, G, B := uint16(0), uint16(0), uint16(0)
+func cssrgb12(css string) *colour.CNRGBA64 {
+	var R, G, B uint16
 	fmt.Sscanf(css, "rgb12(%v,%v,%v)", &R, &G, &B)
-	c := color.NRGBA64{R << 4, G << 4, B << 4, 0xffff}
 
-	return c
+	return &colour.CNRGBA64{R: R << 4, G: G << 4, B: B << 4, A: 0xffff}
 }
 
-func cssrgba12(css string) color.NRGBA64 {
-	R, G, B, A := uint16(0), uint16(0), uint16(0), uint16(0)
+func cssrgba12(css string) *colour.CNRGBA64 {
+	var R, G, B, A uint16
 	fmt.Sscanf(css, "rgba12(%v,%v,%v,%v)", &R, &G, &B, &A)
-	c := color.NRGBA64{R << 4, G << 4, B << 4, A << 4}
+	if A == 4095 {
+		A = 0xffff
+	} else {
+		A <<= 4
+	}
 
-	return c
+	return &colour.CNRGBA64{R: R << 4, G: G << 4, B: B << 4, A: 0xffff}
 }
 
 // ConvertNRGBA64 converts any colour into an NRGBA64 colour.

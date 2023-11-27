@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/mrmxf/opentsg-core/config/validator"
-	"github.com/mrmxf/opentsg-core/credentials"
+	"github.com/mmTristan/opentsg-core/config/validator"
+	"github.com/mmTristan/opentsg-core/credentials"
 	"gopkg.in/yaml.v3"
 )
 
@@ -50,7 +50,7 @@ func FileImport(inputFile, profile string, debug bool, httpKeys ...string) (cont
 	}
 
 	holder := base{importedFactories: make(map[string]factory), importedWidgets: make(map[string]json.RawMessage),
-		jsonFileLines: data, authBody: authDecoder}
+		jsonFileLines: data, authBody: authDecoder, metadataParams: map[string][]string{}}
 
 	err = holder.factoryInit(inputFactory, filepath.Dir(inputFile), "", []int{})
 	if err != nil {
@@ -101,6 +101,7 @@ func (b *base) factoryInit(jsonFactory factory, path, parent string, positions [
 				fileBytes, err = os.ReadFile(inputPath)
 			}
 		}
+
 		if err == nil {
 
 			// check if the bytes have children by being a json factory
@@ -109,13 +110,14 @@ func (b *base) factoryInit(jsonFactory factory, path, parent string, positions [
 			if err != nil {
 				return fmt.Errorf("0005 error parsing %s: %v", inputPath, err)
 			}
+
 			if _, ok := b.importedWidgets[parent+f.Name]; ok {
 				return fmt.Errorf("0006 the alias %s is repeated, every alias is required to be unique", parent+f.Name)
 			} else if _, ok := b.importedFactories[parent+f.Name]; ok {
 				return fmt.Errorf("0006 the alias %s is repeated, every alias is required to be unique", parent+f.Name)
 			}
 
-			// schemavalidation to sort between widgets and factories
+			// schema validation to sort between widgets and factories
 			factLines := make(validator.JSONLines)
 			err = validator.Liner(fileBytes, inputPath, "factory", factLines) // treat it as a factory update
 			if err != nil {
@@ -124,8 +126,8 @@ func (b *base) factoryInit(jsonFactory factory, path, parent string, positions [
 
 			var validatorError error
 			if err := validator.SchemaValidator(incschema, fileBytes, parent, factLines); err != nil {
+				// @TODO include a better error handling method
 				b.importedWidgets[parent+f.Name] = fileBytes
-
 				validatorError = validator.Liner(fileBytes, inputPath, "widget", b.jsonFileLines)
 			} else {
 				// schema check here?
@@ -148,6 +150,8 @@ func (b *base) factoryInit(jsonFactory factory, path, parent string, positions [
 			return err
 			// fmt.Println(fmt.Errorf("Error opening %v:, %v\n", p, err))
 		}
+
+		b.metadataParams[parent+f.Name] = f.Args
 	}
 
 	return nil

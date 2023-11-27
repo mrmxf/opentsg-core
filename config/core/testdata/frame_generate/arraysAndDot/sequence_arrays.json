@@ -1,6 +1,6 @@
 {
     "include":[
-        {"uri": "./frame_arrays.json", "name":"frame"}
+        {"uri": "./frame_arrays.json", "name":"frame", "args":["swatchType"]}
     ],
     "create":[
         {"frame": {"swatchType":"blue"}},
