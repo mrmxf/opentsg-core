@@ -9,9 +9,9 @@ require (
 	github.com/cespare/xxhash v1.1.0
 	github.com/fogleman/gg v1.3.0
 	github.com/matoous/go-nanoid v1.5.0
-	github.com/mrmxf/opentsg-widgets v0.0.0-20231102133447-daa36fe59eef
 	github.com/mrmxf/opentsg-io v0.0.0-20230830164134-91af35b9a721
 	github.com/mrmxf/opentsg-mhl v0.0.0-20230713210602-b4af671ab2ac
+	github.com/mrmxf/opentsg-widgets v0.4.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/peterbourgon/mergemap v0.0.1
 	github.com/smartystreets/goconvey v1.8.1
@@ -42,15 +42,10 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
-	github.com/mrmxf/opentsg-core v0.0.0-20230830153622-6d3831e3c1ed // indirect
 	github.com/smarty/assertions v1.15.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
-	github.com/yuin/goldmark v1.6.0 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	golang.org/x/mod v0.13.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
-	golang.org/x/tools v0.14.0 // indirect
 )
