@@ -9,9 +9,9 @@ import (
 
 	_ "embed"
 
-	"github.com/mmTristan/opentsg-core/colour"
-	"github.com/mmTristan/opentsg-core/config"
-	"github.com/mmTristan/opentsg-core/config/widgets"
+	"github.com/mrmxf/opentsg-core/colour"
+	"github.com/mrmxf/opentsg-core/config"
+	"github.com/mrmxf/opentsg-core/config/widgets"
 )
 
 type key struct {

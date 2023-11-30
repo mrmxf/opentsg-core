@@ -11,8 +11,8 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/mmTristan/opentsg-core/colour"
-	"github.com/mmTristan/opentsg-core/config/core"
+	"github.com/mrmxf/opentsg-core/colour"
+	"github.com/mrmxf/opentsg-core/config/core"
 	"github.com/nfnt/resize"
 	"golang.org/x/image/tiff"
 )

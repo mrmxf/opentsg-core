@@ -12,11 +12,11 @@ import (
 	"strings"
 
 	"github.com/fogleman/gg"
-	"github.com/mmTristan/opentsg-core/aces"
-	"github.com/mmTristan/opentsg-core/canvaswidget"
-	"github.com/mmTristan/opentsg-core/colour"
-	"github.com/mmTristan/opentsg-core/colourgen"
-	"github.com/mmTristan/opentsg-core/config/core"
+	"github.com/mrmxf/opentsg-core/aces"
+	"github.com/mrmxf/opentsg-core/canvaswidget"
+	"github.com/mrmxf/opentsg-core/colour"
+	"github.com/mrmxf/opentsg-core/colourgen"
+	"github.com/mrmxf/opentsg-core/config/core"
 )
 
 type gridContextKey struct {
@@ -378,7 +378,6 @@ func gridSquareLocatorAndGenerator(gridString, alias string, c *context.Context)
 		generatedGridInfo.Y = int(float64(ys-1) * squareY)
 		// make a 1x1 square
 		generatedGridInfo.w, generatedGridInfo.h = int(float64(xe-1)*squareX)-generatedGridInfo.X, int(float64(ye-1)*squareY)-generatedGridInfo.Y
-
 		//squareX*(xe-xs), squareY*(ye-ys)
 	case regAlias.MatchString(gridString):
 		loc := aliasMap.Data[gridString]

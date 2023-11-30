@@ -13,12 +13,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mmTristan/opentsg-core/canvaswidget"
-	"github.com/mmTristan/opentsg-core/colour"
-	"github.com/mmTristan/opentsg-core/colourgen"
-	"github.com/mmTristan/opentsg-core/config/core"
-	errhandle "github.com/mmTristan/opentsg-core/errHandle"
-	"github.com/mmTristan/opentsg-core/gridgen"
+	"github.com/mrmxf/opentsg-core/canvaswidget"
+	"github.com/mrmxf/opentsg-core/colour"
+	"github.com/mrmxf/opentsg-core/colourgen"
+	"github.com/mrmxf/opentsg-core/config/core"
+	errhandle "github.com/mrmxf/opentsg-core/errHandle"
+	"github.com/mrmxf/opentsg-core/gridgen"
 	. "github.com/smartystreets/goconvey/convey"
 )
 

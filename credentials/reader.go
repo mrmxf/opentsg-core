@@ -163,7 +163,7 @@ func gitHubDecode(url string, a token) ([]byte, error) {
 	}
 
 	// If not api then we'll amend it to that
-	// https://github.com/mmTristan/ascmhl/schema/ascmhl.xsd
+	// https://github.com/mrmxf/ascmhl/schema/ascmhl.xsd
 	// https://api.github.com/repos/mmTristan/ascmhl/contents/schema%2Fascmhl.xsd
 	// Convert gitlab links to gitlab api calls
 	if regGitH.MatchString(url) && !regGitHbAPI.MatchString(url) {

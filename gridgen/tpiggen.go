@@ -13,8 +13,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/mmTristan/opentsg-core/colour"
-	"github.com/mmTristan/opentsg-core/config/core"
+	"github.com/mrmxf/opentsg-core/colour"
+	"github.com/mrmxf/opentsg-core/config/core"
 )
 
 type TPIGCompile struct {

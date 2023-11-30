@@ -1,6 +1,6 @@
 # mmReader
 
-mmReader is used to extract file data from websites as bytes, what you choose to do with that data is up to you, that may be require additional login information to access. 
+mmReader is used to extract file data from websites as bytes, what you choose to do with that data is up to you, that may be require additional login information to access.
 This is designed to handle any API calls that may occur automatically for when you need to access across a variety of domains.
 
 Current supported domains are:
@@ -17,7 +17,7 @@ Then import it into your go program.
 
 ```go
 import (
-    "github.com/mmTristan/mmReader"
+    "github.com/mrmxf/mmReader"
 )
 ```
 
@@ -76,4 +76,3 @@ fileBytes, errHttp := decoder.Decode("example.com/pathto/important/file.json")
 Any style is acceptable for http but it is expected to follow this layout.
 
 - https://example.com/path/to/name/of/file.json
-

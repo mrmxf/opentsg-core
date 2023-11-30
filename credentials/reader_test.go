@@ -61,7 +61,7 @@ func TestDecodeGitHub(t *testing.T) {
 	if ghToken != "" {
 		addresses := []string{"https://api.github.com/repos/mmTristan/public/contents/nested%2Fnest.json",
 			"https://api.github.com/repos/mmTristan/ascmhl/contents/schema%2Fascmhl.xsd",
-			"https://github.com/mmTristan/ascmhl/schema/ascmhl.xsd"}
+			"https://github.com/mrmxf/ascmhl/schema/ascmhl.xsd"}
 		tokens := []string{"", token, token}
 		expec := []string{"bb9dd8180d70abce882ccdb69aab2bffa1a96c8f86cdbcd631948b3085465ab9",
 			"0235e307f3930b9f8142c37f23f6e4d55fedb534dda19227069c2c95948f2bcb",
