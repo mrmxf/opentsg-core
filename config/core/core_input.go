@@ -156,3 +156,54 @@ func (b *base) factoryInit(jsonFactory factory, path, parent string, positions [
 
 	return nil
 }
+
+/*
+// The resource search algorthim
+func (b *base) FileSearch(URI, path string) ([]byte, error) {
+	fileBytes, errHTTP := b.authBody.Decode(URI)
+
+
+	/* If they find it they use it.
+
+We're searching for, path/name.ext
+
+	1 . look relative to _main.json look for path(main)/path/name.ext
+	2. relative to path(parent)/path/name.ext
+	3. while parent(path)^n/path/name.ext. 
+
+	look relative to wd of the executable
+    
+    look relative to the prefix specified in env OPENTSG_HOME
+	*/
+
+	/*
+	file.Abs(URI + path)
+	
+	
+	// compare to any os.Getwd()
+	
+
+	var err error
+	// generate the input path per run to stop overwriting errors
+	inputPath := path
+	if errHTTP != nil {
+		// check again as an extension of the url
+		oldpath := inputPath
+		inputPath, _ = url.JoinPath(inputPath, URI)
+		// inputPath = filepath.Clean(filepath.Join(inputPath, f.URI))
+
+		fileBytes, errHTTP = b.authBody.Decode(inputPath)
+
+		// then check the local files
+		if errHTTP != nil {
+			//retry the file as a path
+			inputPath = filepath.Join(oldpath, f.URI)
+			inputPath, _ = filepath.Abs(inputPath)
+			// inputPath = filepath.Clean(filepath.Join(inputPath, f.URI))
+			fileBytes, err = os.ReadFile(inputPath)
+		}
+	}
+	fmt.Println(err)
+	return fileBytes, errHTTP
+}
+*/
