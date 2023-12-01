@@ -98,6 +98,38 @@ func FrameWidgetsGenerator(c context.Context, pos int, debug bool) (context.Cont
 		}
 	}
 
+
+	// Metadata update of the base widget
+	for k, wc := range bases.generatedFrameWidgets {
+		// if it is widget to be updated
+		if wc.Tag != "" {
+			metadata, _ := bases.metadataGetter(map[string]any{}, k)
+			var widget map[string]any
+			yaml.Unmarshal(wc.Data, &widget)
+
+			updatedWidget, err := objectMustacheUpdater(widget, metadata, k, "", "")
+			if err != nil {
+				allError = append(allError, err)
+			} else {
+				updatedByte, _ := yaml.Marshal(updatedWidget)
+				wc.Data = updatedByte
+				bases.generatedFrameWidgets[k] = wc
+			}
+		}
+	}
+
+	// after getting all the updates apply the metadata to the base widgets.
+	/*
+
+		pseudo code
+
+		loop through every update. Get the relevant metadata, from parents to child.
+		apply the updates with the object
+
+		then carry on
+
+	*/
+
 	// fmt.Println(bases.metadataBucket)
 
 	parentsOfWidgetsMap := SyncMap{make(map[string]string), &sync.Mutex{}}
@@ -187,7 +219,7 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 
 			//args := childFactory.getArgs()
 
-			metadata2 := make(map[string]any)
+			//metadata2 := make(map[string]any)
 
 			//	parents := strings.Split(fullname, ".")
 			//var base string
@@ -253,8 +285,8 @@ func (b *base) createWidgets(createTargets map[string]map[string]any, parent str
 
 			// b.metadataBucket[fullname] = metadata
 
-			mapOverWriter(metadata2, metadata)
-			metadata = metadata2
+			//mapOverWriter(metadata2, metadata)
+			//metadata = metadata2
 
 			//		fmt.Println(b.metadataBucket, metadata2, base, "metadata")
 			// fmt.Println(b.metadataBucket, runKey, parents, dotExt, "md", dotPath)
