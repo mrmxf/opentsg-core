@@ -9,9 +9,9 @@ require (
 	github.com/cespare/xxhash v1.1.0
 	github.com/fogleman/gg v1.3.0
 	github.com/matoous/go-nanoid v1.5.0
-	github.com/mrmxf/opentsg-io v0.0.0-20230830164134-91af35b9a721
-	github.com/mrmxf/opentsg-mhl v0.0.0-20230713210602-b4af671ab2ac
-	github.com/mrmxf/opentsg-widgets v0.4.0
+	github.com/mrmxf/opentsg-io v0.4.0
+	github.com/mrmxf/opentsg-mhl v0.4.0
+	github.com/mrmxf/opentsg-widgets v0.4.1
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/peterbourgon/mergemap v0.0.1
 	github.com/smartystreets/goconvey v1.8.1
